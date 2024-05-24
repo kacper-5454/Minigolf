@@ -1,8 +1,10 @@
 #pragma once
-#include "Background.h"
-class Wall : public Background
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include"BackgroundElement.h"
+class Wall : public BackgroundElement
 {
 public:
-	Wall(sf::Vector2f);
+	Wall(sf::Vector2f, float);
 };
 

@@ -1,4 +1,7 @@
 #include "Hole.h"
 
-Hole::Hole(sf::Vector2f position) :
-	Background("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_medium.jpg", position) {}
+Hole::Hole(sf::Vector2f position, float size)
+{
+	this->setPosition(position);
+	this->setSize(sf::Vector2f(size, size));
+}

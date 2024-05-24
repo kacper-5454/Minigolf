@@ -1,9 +1,10 @@
 #pragma once
-#include "Background.h"
-class Sand
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include"BackgroundElement.h"
+class Sand : public BackgroundElement
 {
-private:
-	float friction = 0.5;
 public:
-	Sand(sf::Vector2f);
+	Sand(sf::Vector2f, float);
 };
+

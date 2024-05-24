@@ -4,32 +4,30 @@
 #include <SFML/Graphics.hpp>
 #include<fstream>
 #include<sstream>
+#include"TitleScreen.h"
+#include"Screen.h"
 
 
 int main()
 {
-    Map map = Map("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\map.txt", 20.0);
+    sf::RenderWindow window(sf::VideoMode(800, 450), "Minigolf");
 
-    sf::RenderWindow window(sf::VideoMode(map.getWidth(), map.getHeight()), "Minigolf");
+    std::unique_ptr<Screen> currentScreen = std::make_unique<TitleScreen>();
 
-    sf::Clock clock;
-    sf::Time elapsed;
-
-    while (window.isOpen())
+    char button = currentScreen->run(window);
+    switch (button)
     {
-        elapsed = clock.restart();
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        window.clear(sf::Color::Black);
-
-        map.draw(window);
-
-        window.display();
+    case 'p':
+        currentScreen = std::make_unique<Map>("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\map.txt");
+        currentScreen->run(window);
+        //move to level-choosing menu
+        break;
+    case 'c':
+        //move to create mode
+        break;
+    default:
+        std::cerr << "Unidenified button clicked" << std::endl;
     }
+
     return 0;
 }

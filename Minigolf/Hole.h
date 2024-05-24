@@ -1,9 +1,10 @@
 #pragma once
-#include "Background.h"
-class Hole : public Background
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include"BackgroundElement.h"
+class Hole : public BackgroundElement
 {
 public:
-	Hole(sf::Vector2f);
+	Hole(sf::Vector2f, float);
 };
-
 

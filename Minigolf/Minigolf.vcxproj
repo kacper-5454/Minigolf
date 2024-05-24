@@ -133,16 +133,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Background_element.cpp" />
+    <ClCompile Include="BackgroundElement.cpp" />
     <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Grass.cpp" />
+    <ClCompile Include="Hole.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Sand.cpp" />
+    <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="TitleScreen.cpp" />
+    <ClCompile Include="Wall.cpp" />
+    <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Background_element.h" />
-    <ClInclude Include="Background_type.h" />
+    <ClInclude Include="BackgroundElement.h" />
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Grass.h" />
+    <ClInclude Include="Hole.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Sand.h" />
+    <ClInclude Include="Screen.h" />
+    <ClInclude Include="TitleScreen.h" />
+    <ClInclude Include="Wall.h" />
+    <ClInclude Include="Water.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

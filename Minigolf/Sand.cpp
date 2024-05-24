@@ -1,7 +1,7 @@
 #include "Sand.h"
 
-Sand::Sand(sf::Vector2f position) :
-	Background("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_dark.jpg", position)
+Sand::Sand(sf::Vector2f position, float size)
 {
-	friction = 0.5;
+	this->setPosition(position);
+	this->setSize(sf::Vector2f(size, size));
 }

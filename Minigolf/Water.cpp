@@ -1,4 +1,7 @@
 #include "Water.h"
 
-Water::Water(sf::Vector2f position) :
-	Background("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\grass_light.jpg", position) {}
+Water::Water(sf::Vector2f position, float size)
+{
+	this->setPosition(position);
+	this->setSize(sf::Vector2f(size, size));
+}

@@ -1,9 +1,10 @@
 #pragma once
-#include"Background.h"
-class Grass : public Background
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include"BackgroundElement.h"
+class Grass : public BackgroundElement
 {
-private:
-	float friction = 0.25;
 public:
-	Grass(sf::Vector2f);
+	Grass(sf::Vector2f, float);
 };
+
