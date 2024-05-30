@@ -38,6 +38,7 @@ std::vector<std::string> readFile(std::string source_path)
         std::cerr << "Data vector contains wrong number of elements" << std::endl;
     }
 }
+
 sf::Texture loadTexture(std::string path)
 {
     sf::Texture texture;
@@ -165,9 +166,17 @@ void Map::draw(sf::RenderWindow& window)
     {
         window.draw(*el);
     }
-    window.draw(this->ball);
-   
+    this->ball.draw_ball(window);
 }
+
+void Map::collide()
+{
+    for (auto &el : elements)
+    {
+        el->collide(this->ball);
+    }
+}
+
 
 char Map::run(sf::RenderWindow& window)
 {
@@ -186,7 +195,7 @@ char Map::run(sf::RenderWindow& window)
                
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
             {
-                this->ball.update_status();
+                this->ball.update_status(window);
             }
 
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
@@ -195,14 +204,17 @@ char Map::run(sf::RenderWindow& window)
             }
         }
 
-        //collisions TO DO!
-        //z tego dostajemy(lub nie):
-        float friction = 50.0;
+        /*if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            this->ball.update_status(window);
+        }*/
+
+        collide();
 
         //moving
         elapsed = clock.restart();
         float deltaSeconds = elapsed.asSeconds();
-        this->ball.move_ball(deltaSeconds, friction);
+        this->ball.move_ball(deltaSeconds);
         
         //drawing and displaying
         window.clear(sf::Color::Black);

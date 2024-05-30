@@ -3,12 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include"Ball.h"
 #include"Screen.h"
+#include"BackgroundElement.h"
 
 class Map : public Screen
 {
 private:
 	std::vector<sf::Texture> textures;
-	std::vector<std::unique_ptr<sf::RectangleShape>> elements;
+	std::vector<std::unique_ptr<BackgroundElement>> elements;
 	float element_size = 20.0;
 	int width;
 	int height;
@@ -22,5 +23,6 @@ public:
 	int getHeight();
 	void draw(sf::RenderWindow&);
 	char run(sf::RenderWindow&);
+	void collide();
 };
 

@@ -3,25 +3,34 @@
 
 Ball::Ball(sf::Vector2f initial_position)
 {
-    if (!this->texture.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_dark.jpg"))
-    {
-        std::cerr << "Couldnt load ball texture" << std::endl;
-    }
-    else
-    {
-        this->setTexture(&this->texture);  
-    }
     this->setRadius(5.0);
 	this->setPosition(initial_position);
+    this->setFillColor(sf::Color::White);
+    this->setOutlineColor(sf::Color::Black);
+    this->setOutlineThickness(2.0);
+    this->arrow.update(initial_position, this->direction, this->speed, this->getRadius());
 }
 
 Ball::Ball() {}
 
-void Ball::update_status()
+void Ball::calculateDirectionAndSpeed(sf::RenderWindow& window)
+{
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePositionF(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y));
+    this->direction = this->getPosition() - mousePositionF;
+    this->speed = std::sqrt(direction.x * direction.x + direction.y * direction.y) * 5.0; // Adjust speed factor as needed
+    if (this->speed > 0.0f)
+    {
+        direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y); // Normalize direction
+    }
+}
+void Ball::update_status(sf::RenderWindow& window)
 {
     if (!this->isMoving)
     {
+        calculateDirectionAndSpeed(window);
         this->isDragging = true;
+        this->arrow.update(this->getPosition(), this->direction, this->speed, this->getRadius());
     }
 }
 
@@ -29,29 +38,50 @@ void Ball::release(sf::RenderWindow& window)
 {
     if (this->isDragging)
     {
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-        sf::Vector2f mousePositionF(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y));
-        this->direction = this->getPosition() - mousePositionF;
-        this->speed = std::sqrt(direction.x * direction.x + direction.y * direction.y) * 10.0; // Adjust speed factor as needed
-        if (this->speed > 0.0f)
-        {
-            direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y); // Normalize direction
-        }
+        calculateDirectionAndSpeed(window);
         this->isDragging = false;
         this->isMoving = true;
     }
 }
 
-void Ball::move_ball(float time, float friction)
+void Ball::move_ball(float time)
 {
     if (this->isMoving)
     {
         this->move(this->direction * this->speed * time);
-        this->speed -= friction * time; // Apply friction
+        this->speed -= this->friction * time; // Apply friction
         if (speed < 0.0f)
         {
             this->speed = 0.0f;
             this->isMoving = false;
         }
     }
+}
+
+void Ball::draw_ball(sf::RenderWindow& window)
+{
+    window.draw(*this);
+    if (this->isDragging)
+    {
+        this->arrow.draw(window);
+    }
+}
+
+void Ball::setFriction(float fr)
+{
+    this->friction = fr;
+}
+void Ball::setDirection(sf::Vector2f dir)
+{
+    this->direction = dir;
+}
+
+sf::Vector2f Ball::getDirection()
+{
+    return this->direction;
+}
+
+float Ball::getSpeed()
+{
+    return this->speed;
 }
