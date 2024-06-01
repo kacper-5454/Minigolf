@@ -5,6 +5,6 @@
 class BackgroundElement : public sf::RectangleShape
 {
 public:
-	virtual void collide(Ball&) = 0;
+	virtual bool collide(Ball&) = 0;
 };
 

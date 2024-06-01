@@ -39,20 +39,6 @@ std::vector<std::string> readFile(std::string source_path)
     }
 }
 
-sf::Texture loadTexture(std::string path)
-{
-    sf::Texture texture;
-    if (texture.loadFromFile(path))
-    {
-        return texture;
-    }
-    else
-    {
-        std::cerr << "Error: Could not load texture from " << path << std::endl;
-    }
-
-}
-
 void Map::loadElements(std::string background_data)
 {
     float x_pos = 0.0;
@@ -94,7 +80,7 @@ void Map::loadElements(std::string background_data)
 void Map::loadMapTextures()
 {
     //Grass [0]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_medium.jpg"));
+    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_light.jpg"));
     //Sand [2]
     textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\sand.jpg"));
     //Water [3]
@@ -162,6 +148,7 @@ int Map::getHeight()
 
 void Map::draw(sf::RenderWindow& window)
 {
+    window.setView(getView());
     for (const auto& el : elements)
     {
         window.draw(*el);
@@ -169,19 +156,24 @@ void Map::draw(sf::RenderWindow& window)
     this->ball.draw_ball(window);
 }
 
-void Map::collide()
+bool Map::collide()
 {
     for (auto &el : elements)
     {
-        el->collide(this->ball);
+        if (el->collide(this->ball))
+        {
+            return true;
+        }
     }
+    return false;
 }
-
 
 char Map::run(sf::RenderWindow& window)
 {
     sf::Clock clock;
     sf::Time elapsed;
+
+    this->setView(window.getDefaultView());
 
     while (window.isOpen())
     {
@@ -191,6 +183,11 @@ char Map::run(sf::RenderWindow& window)
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+
+            if (event.type == sf::Event::Resized)
+            {
+                handleResize(window);
             }
                
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
@@ -209,7 +206,11 @@ char Map::run(sf::RenderWindow& window)
             this->ball.update_status(window);
         }*/
 
-        collide();
+        bool isHoleScored = collide();
+        if (isHoleScored)
+        {
+            return 'w';
+        }
 
         //moving
         elapsed = clock.restart();
@@ -221,6 +222,6 @@ char Map::run(sf::RenderWindow& window)
         this->draw(window);
         window.display();
     }
-    return 'q';
+    return 'w';
 }
 

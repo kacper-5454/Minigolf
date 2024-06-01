@@ -7,7 +7,7 @@ Wall::Wall(sf::Vector2f position, float size)
 	this->setSize(sf::Vector2f(size, size));
 }
 
-void Wall::collide(Ball& ball)
+bool Wall::collide(Ball& ball)
 {
 	//detect collision
 	float testX = ball.getPosition().x;
@@ -55,4 +55,5 @@ void Wall::collide(Ball& ball)
 			ball.setDirection(sf::Vector2f(ball.getDirection().x, std::abs(ball.getDirection().y)));
 		}
 	}
+	return false;
 }

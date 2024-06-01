@@ -23,6 +23,6 @@ public:
 	int getHeight();
 	void draw(sf::RenderWindow&);
 	char run(sf::RenderWindow&);
-	void collide();
+	bool collide();
 };
 

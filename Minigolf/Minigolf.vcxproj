@@ -137,8 +137,10 @@
     <ClCompile Include="BackgroundElement.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Creator.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="Hole.cpp" />
+    <ClCompile Include="Tile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Sand.cpp" />
@@ -152,8 +154,10 @@
     <ClInclude Include="BackgroundElement.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Creator.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="Hole.h" />
+    <ClInclude Include="Tile.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Sand.h" />
     <ClInclude Include="Screen.h" />

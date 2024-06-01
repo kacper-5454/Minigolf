@@ -9,9 +9,8 @@ Ball::Ball(sf::Vector2f initial_position)
     this->setOutlineColor(sf::Color::Black);
     this->setOutlineThickness(2.0);
     this->arrow.update(initial_position, this->direction, this->speed, this->getRadius());
+    this->last_position = initial_position;
 }
-
-Ball::Ball() {}
 
 void Ball::calculateDirectionAndSpeed(sf::RenderWindow& window)
 {
@@ -24,6 +23,7 @@ void Ball::calculateDirectionAndSpeed(sf::RenderWindow& window)
         direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y); // Normalize direction
     }
 }
+
 void Ball::update_status(sf::RenderWindow& window)
 {
     if (!this->isMoving)
@@ -41,6 +41,7 @@ void Ball::release(sf::RenderWindow& window)
         calculateDirectionAndSpeed(window);
         this->isDragging = false;
         this->isMoving = true;
+        this->last_position = this->getPosition();
     }
 }
 
@@ -71,6 +72,7 @@ void Ball::setFriction(float fr)
 {
     this->friction = fr;
 }
+
 void Ball::setDirection(sf::Vector2f dir)
 {
     this->direction = dir;
@@ -84,4 +86,14 @@ sf::Vector2f Ball::getDirection()
 float Ball::getSpeed()
 {
     return this->speed;
+}
+
+sf::Vector2f Ball::getLastPosition()
+{
+    return this->last_position;
+}
+
+void Ball::setMoving(bool iM)
+{
+    this->isMoving = iM;
 }

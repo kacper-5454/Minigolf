@@ -6,6 +6,6 @@ class Wall : public BackgroundElement
 {
 public:
 	Wall(sf::Vector2f, float);
-	void collide(Ball&);
+	bool collide(Ball&);
 };
 
