@@ -3,12 +3,13 @@
 #include"Screen.h"
 #include"Button.h"
 #include"Tile.h"
+#include"Textbox.h"
 #include<set>
 
 class Creator :  public Screen
 {
 private:
-	float gridSize = 20.0;
+	float gridSize;
 	sf::Vector2i mousePosGrid;
 	std::vector<Tile> icons;
 	std::vector<sf::Texture> textures;
@@ -20,16 +21,21 @@ private:
 	sf::Font font;
 	std::vector<sf::Text> menuText;
 	sf::RectangleShape saveButton;
+	sf::Vector2f ball_pos;
+	std::string currentErrorMessage = "No errors";
+	Textbox textbox;
 public:
-	Creator(int, int);
+	Creator(int, int, float);
 	char run(sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	void calculateMousePosGrid(sf::Vector2i, sf::RenderWindow&);
 	void makeIcons();
 	void loadTextures();
-	void makeGrid(int, int);
 	void placeOnScreen();
 	void addTile(sf::Vector2f, int);
 	void makeText();
+	void prefillGrid(int, int);
+	bool validateMap(int, int);
+	void saveMap();;
 };
 

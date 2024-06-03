@@ -14,10 +14,10 @@ bool Tile::isClicked(sf::Vector2i mouse_pos)
     }
 }
 
-Tile::Tile(sf::Vector2f position, char tp)
+Tile::Tile(sf::Vector2f position, char tp, float gridSize)
 {
 	this->type = tp;
-	this->setSize(sf::Vector2f(20.0, 20.0));
+	this->setSize(sf::Vector2f(gridSize, gridSize));
 	this->setPosition(position);
 }
 

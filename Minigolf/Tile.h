@@ -7,7 +7,7 @@ private:
 	sf::Texture texture;
 	char type;
 public:
-	Tile(sf::Vector2f, char);
+	Tile(sf::Vector2f, char, float);
 	void draw_icon(sf::RenderWindow&);
 	bool isClicked(sf::Vector2i);
 	char getType();
@@ -18,12 +18,12 @@ public:
             sf::Vector2f posA = a.getPosition();
             sf::Vector2f posB = b.getPosition();
 
-            if (posA.x != posB.x) {
-                return posA.x < posB.x;
-            }
-
             if (posA.y != posB.y) {
                 return posA.y < posB.y;
+            }
+
+            if (posA.x != posB.x) {
+                return posA.x < posB.x;
             }
 
             return false; // They are at the same position

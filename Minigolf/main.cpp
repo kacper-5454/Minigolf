@@ -11,6 +11,7 @@ int main()
 {
     int windowSizeX = 800;
     int windowSizeY = 450;
+    float gridSize = 20.0;
     sf::RenderWindow window(sf::VideoMode(windowSizeX, windowSizeY), "Minigolf");
     window.setFramerateLimit(60);
 
@@ -21,13 +22,13 @@ int main()
     {
     case 'p':
         //move to level-choosing menu
-        currentScreen = std::make_unique<Map>("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\map.txt");
+        currentScreen = std::make_unique<Map>(windowSizeX, windowSizeY, "textmap", gridSize);
         currentScreen->run(window);
         //show score
         //back to title screen
         break;
     case 'c':
-        currentScreen = std::make_unique<Creator>(windowSizeX, windowSizeY);
+        currentScreen = std::make_unique<Creator>(windowSizeX, windowSizeY, gridSize);
         currentScreen->run(window);
         //back to title screen
         break;

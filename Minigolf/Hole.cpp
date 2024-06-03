@@ -14,7 +14,6 @@ bool Hole::collide(Ball& ball)
 	{
 		if(ball.getSpeed() < 100.0)
 		{
-			std::cout << "Level won, make apropriate screen" << std::endl;
 			return true;
 		}
 		else

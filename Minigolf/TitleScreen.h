@@ -7,8 +7,8 @@ class TitleScreen : public Screen
 {
 private:
 	sf::Texture texture;
-	Button play_button = Button("PLAY", sf::Vector2f(220.0, 270.0));
-	Button create_button = Button("CREATE", sf::Vector2f(460.0, 270.0));
+	Button play_button = Button("PLAY", sf::Vector2f(220.0, 270.0), sf::Vector2f(120.0, 60.0));
+	Button create_button = Button("CREATE", sf::Vector2f(460.0, 270.0), sf::Vector2f(120.0, 60.0));
 	sf::Font font;
 	sf::Text title;
 public:

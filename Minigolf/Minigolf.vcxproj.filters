@@ -60,6 +60,12 @@
     <ClCompile Include="Tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MessageBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Textbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -102,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Textbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

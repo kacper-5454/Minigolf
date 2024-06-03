@@ -5,7 +5,7 @@ TitleScreen::TitleScreen(int windowSizeX, int windowSizeY)
 {
     this->setSize(sf::Vector2f(windowSizeX, windowSizeY));
     this->setPosition(sf::Vector2f(0.0, 0.0));
-    if (!this->texture.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\title_background.jpg"))
+    if (!this->texture.loadFromFile("..\\Textures\\title_background.jpg"))
     {
         std::cerr << "Couldnt load title background texture" << std::endl;
     }
@@ -14,7 +14,7 @@ TitleScreen::TitleScreen(int windowSizeX, int windowSizeY)
         this->setTexture(&this->texture);
     }
     
-    if (!this->font.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
+    if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
         std::cerr << "Couldnt load font" << std::endl;
     }

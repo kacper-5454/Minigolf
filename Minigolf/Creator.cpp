@@ -1,31 +1,34 @@
 #include "Creator.h"
 #include<iostream>
-
+#include<fstream>
+#include<cmath>
+#include<string>
+#include"MessageBox.h"
 
 void Creator::makeIcons()
 {
     std::vector<char> types = { 'g', 's', 'w', 'a', 'h', 'b' };
     for (int i = 0; i < types.size(); i++)
     {
-        this->icons.emplace_back(Tile(sf::Vector2f(80.0+ i * 100.0, 0.0), types[i]));
+        this->icons.emplace_back(Tile(sf::Vector2f(80.0+ i * 100.0, 0.0), types[i], this->gridSize));
         this->icons[i].setTexture(&this->textures[i]);
     }
 }
 
 void Creator::loadTextures()
 {
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_light.jpg"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\sand.jpg"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\wall.jpg"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\water.jpg"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\hole.png"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\ball_on_grass_light.png"));
-    this->textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\save_icon.png"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\ball_on_grass_light.png"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\save_icon.png"));
 }
 
 void Creator::makeText()
 {
-    std::vector<std::string> strings = { "Grass", "Sand", "Wall", "Water", "Hole", "Ball" };
+    std::vector<std::string> strings = { "Grass", "Sand", "Wall", "Water", "Hole", "Ball", "Name"};
     for (int i = 0; i < strings.size(); i++)
     {
         sf::Text text;
@@ -42,11 +45,48 @@ void Creator::makeText()
     }
 }
 
-Creator::Creator(int windowSizeX, int windowSizeY)
+void Creator::prefillGrid(int windowSizeX, int windowSizeY)
 {
+    int tile_amount_x = ceil(windowSizeX / this->gridSize);
+    int tile_amount_y = ceil(windowSizeY / this->gridSize);
+
+    for (int i = 0; i < tile_amount_x; i++)
+    {
+        Tile tile1 = Tile(sf::Vector2f(i*this->gridSize, this->gridSize), 'w', this->gridSize);
+        tile1.setTexture(&this->textures[2]);
+        tiles.insert(tile1);
+
+        Tile tile2 = Tile(sf::Vector2f(i * this->gridSize, (tile_amount_y-1)*this->gridSize), 'w', this->gridSize);
+        tile2.setTexture(&this->textures[2]);
+        tiles.insert(tile2);
+    }
+    
+    for (int i = 1; i < tile_amount_y-1; i++)
+    {
+        Tile tile1 = Tile(sf::Vector2f(0.0, (i + 1) * this->gridSize), 'w', this->gridSize);
+        tile1.setTexture(&this->textures[2]);
+        tiles.insert(tile1);
+
+        for (int j = 1; j < tile_amount_x-1; j++)
+        {
+            Tile tile = Tile(sf::Vector2f(j*this->gridSize, (i + 1) * this->gridSize), 'g', this->gridSize);
+            tile.setTexture(&this->textures[0]);
+            tiles.insert(tile);
+        }
+
+        Tile tile2 = Tile(sf::Vector2f((tile_amount_x-1)*this->gridSize, (i + 1) * this->gridSize), 'w', this->gridSize);
+        tile2.setTexture(&this->textures[2]);
+        tiles.insert(tile2);
+    }
+}
+
+Creator::Creator(int windowSizeX, int windowSizeY, float gS):
+    textbox(sf::Vector2f(4 * gS, 0.9 * gS), sf::Vector2f(680.0, 0.0))
+{
+    this->gridSize = gS;
     this->isElementChosen = false;
     this->loadTextures();
-    if (!this->font.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
+    if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
         std::cerr << "Couldnt load font" << std::endl;
     }
@@ -60,37 +100,7 @@ Creator::Creator(int windowSizeX, int windowSizeY)
     this->saveButton.setTexture(&this->textures[6]);
     this->saveButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
     this->saveButton.setPosition(sf::Vector2f(windowSizeX - this->gridSize, 0.0));
-    this->makeGrid(windowSizeX, windowSizeY);
-}
-
-void Creator::makeGrid(int windowSizeX, int windowSizeY)
-{
-    // initialize values
-
-    int columns = windowSizeX/ this->gridSize;
-    int rows = windowSizeY / this->gridSize + 1;
-    int numLines = rows + columns - 2;
-    this->grid.setPrimitiveType(sf::Lines);
-    this->grid.resize(2 * (numLines));
-    auto size = this->getView().getSize();
-
-    // row separators
-    for (int i = 0; i < rows - 1; i++)
-    {
-        int r = i + 1;
-        float rowY = this->gridSize * r;
-        this->grid[i * 2].position = { 0, rowY };
-        this->grid[i * 2 + 1].position = { size.x, rowY };
-    }
-
-    // column separators
-    for (int i = rows - 1; i < numLines; i++)
-    {
-        int c = i - rows + 2;
-        float colX = this->gridSize * c;
-        this->grid[i * 2].position = { colX, 0 };
-        this->grid[i * 2 + 1].position = { colX, size.y };
-    }
+    this->prefillGrid(windowSizeX, windowSizeY);
 }
 
 void Creator::draw(sf::RenderWindow& window)
@@ -100,6 +110,8 @@ void Creator::draw(sf::RenderWindow& window)
 
     window.draw(this->menuBackground);
     window.draw(this->saveButton);
+    this->textbox.draw(window);
+
     for (auto &el : this->icons)
     {
         el.draw_icon(window);
@@ -138,7 +150,7 @@ void Creator::calculateMousePosGrid(sf::Vector2i mouse_pos, sf::RenderWindow& wi
 
 void Creator::addTile(sf::Vector2f tile_pos, int texture_index)
 {
-    Tile tile = Tile(tile_pos, this->currentElementToPlace);
+    Tile tile = Tile(tile_pos, this->currentElementToPlace, this->gridSize);
     tile.setTexture(&this->textures[texture_index]);
 
     auto it = this->tiles.find(tile);
@@ -180,6 +192,128 @@ void Creator::placeOnScreen()
     }
 }
 
+bool Creator::validateMap(int windowSizeX, int windowSizeY)
+{
+    int ball_count = 0;
+    int hole_count = 0;
+
+    int tile_amount_x = ceil(windowSizeX / this->gridSize);
+    int tile_amount_y = ceil(windowSizeY / this->gridSize);
+
+    for (auto el : tiles)
+    {
+        if (el.getType() == 'b')
+        {
+            this->ball_pos = sf::Vector2f(el.getPosition().x + this->gridSize / 2.0, el.getPosition().y + this->gridSize/ 2.0);
+            ball_count++;
+        }
+        else if (el.getType() == 'h')
+        {
+            hole_count++;
+        }
+        
+        bool topPerimeter = (el.getPosition().y == this->gridSize);
+        bool bottomPerimeter = (el.getPosition().y == (tile_amount_y - 1) * this->gridSize);
+        bool leftPerimeter = (el.getPosition().x == 0.0);
+        bool rightPerimeter = (el.getPosition().x == (tile_amount_x - 1) * this->gridSize);
+        
+        bool isPerimeter = topPerimeter || bottomPerimeter || leftPerimeter || rightPerimeter;
+ 
+        if (isPerimeter)
+        {
+            if (el.getType() != 'w')
+            {
+                this->currentErrorMessage = "Perimeter isn't made entirely\nout of wall tile ";
+                return false;
+            }         
+        }
+    }
+
+    if (ball_count != 1 || hole_count != 1)
+    {
+        this->currentErrorMessage = "To many or\nno balls or holes";
+        return false;
+    }
+
+    if (this->textbox.getString().empty())
+    {
+        this->currentErrorMessage = "Add a name \nto your map!";
+        return false;
+    }
+
+    return true;
+}
+
+void Creator::saveMap()
+{
+    std::string file_path = "..\\Maps\\" + this->textbox.getString() + ".txt";
+    std::ofstream file(file_path);
+    std::string ball_pos_x_string = std::to_string(static_cast<int>(this->ball_pos.x));
+    std::string ball_pos_y_string = std::to_string(static_cast<int>(this->ball_pos.y));
+    std::cout << ball_pos_x_string << " " << ball_pos_y_string << std::endl;
+
+    if (this->ball_pos.x < 100.0)
+    {
+        if (this->ball_pos.x < 10.0)
+        {
+            ball_pos_x_string = "00" + ball_pos_x_string;
+        }
+        else
+        {
+            ball_pos_x_string = "0" + ball_pos_x_string;
+        }
+    }
+    if (this->ball_pos.y < 100.0)
+    {
+        if (this->ball_pos.y < 10.0)
+        {
+            ball_pos_y_string = "00" + ball_pos_y_string;
+        }
+        else
+        {
+            ball_pos_y_string = "0" + ball_pos_y_string;
+        }
+    }
+
+    std::string ball_pos_string = ball_pos_x_string + ball_pos_y_string;
+
+    file << ball_pos_string;
+
+    for (auto el : tiles)
+    {
+        if (el.getPosition().x == 0.0)
+        {
+            file << 'n';
+        }
+
+        switch (el.getType())
+        {
+        case 'g':
+            file << 'g';
+            break;
+        case 's':
+            file << 's';
+            break;
+        case 'a':
+            file << 'a';
+            break;
+        case 'w':
+            file << 'w';
+            break;
+        case 'h':
+            file << 'h';
+            break;
+        case 'b':
+            file << 'g';
+            break;
+        default:
+            std::cerr << "Couldnt identify tile type" << std::endl;
+            break;
+        }
+    }
+    file.close();
+}
+
 char Creator::run(sf::RenderWindow& window)
 {
     this->setView(window.getDefaultView());
@@ -199,6 +333,20 @@ char Creator::run(sf::RenderWindow& window)
                 handleResize(window);
             }
 
+            if (event.type == sf::Event::KeyPressed)
+            {
+                sf::Keyboard::Key keycode = event.key.code;
+                if (keycode >= sf::Keyboard::A && keycode <= sf::Keyboard::Z)
+                {
+                    char chr = static_cast<char>(keycode - sf::Keyboard::A + 'a');
+                    this->textbox.appendString(chr);
+                }
+                if (keycode == sf::Keyboard::Key::Backspace)
+                {
+                    this->textbox.backspace();
+                }
+            }
+
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
             {
                 sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
@@ -214,10 +362,17 @@ char Creator::run(sf::RenderWindow& window)
                 sf::FloatRect bounds = this->saveButton.getGlobalBounds();
                 if (bounds.contains(static_cast<sf::Vector2f>(mouse_pos)))
                 {
-                    //make sure the map is valid
-                    // if not show message whats wrong
-                    //save map
-                    return 's';
+                    if (validateMap(window.getSize().x, window.getSize().y))
+                    {
+                        saveMap();
+                        return 's';
+                    }
+                    else
+                    {
+                        MessageBox messageBox(this->currentErrorMessage, "OK", window.getSize().x, window.getSize().y);
+                        messageBox.run(window);
+                    }
+                    
                 }
 
                 if (this->isElementChosen)

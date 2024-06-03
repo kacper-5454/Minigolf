@@ -140,6 +140,8 @@
     <ClCompile Include="Creator.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="Hole.cpp" />
+    <ClCompile Include="MessageBox.cpp" />
+    <ClCompile Include="Textbox.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -157,6 +159,8 @@
     <ClInclude Include="Creator.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="Hole.h" />
+    <ClInclude Include="MessageBox.h" />
+    <ClInclude Include="Textbox.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Sand.h" />

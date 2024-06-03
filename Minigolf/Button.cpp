@@ -1,9 +1,9 @@
 #include "Button.h"
 #include<iostream>
 
-Button::Button(std::string text_string, sf::Vector2f position)
+Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size)
 {
-    if (this->texture.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\button_background.png"))
+    if (this->texture.loadFromFile("..\\Textures\\button_background.png"))
     {
         this->setTexture(&this->texture);
     }
@@ -12,9 +12,9 @@ Button::Button(std::string text_string, sf::Vector2f position)
         std::cerr << "Error: Could not load button background texture" << std::endl;
     }
     this->setPosition(position);
-    this->setSize(sf::Vector2f(120.0, 60.0));
+    this->setSize(size);
 
-    if (this->font.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
+    if (this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
         this->text.setFont(font);
     }

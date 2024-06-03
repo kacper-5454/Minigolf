@@ -5,6 +5,7 @@
 #include"Water.h"
 #include"Wall.h"
 #include"Hole.h"
+#include"MessageBox.h"
 #include<string>
 #include<fstream>
 #include<sstream>
@@ -20,13 +21,13 @@ std::vector<std::string> readFile(std::string source_path)
 
         std::string map_string = map_stream.str();
 
-        std::string ball_pos_x_string = map_string.substr(0, 5);
+        std::string ball_pos_x_string = map_string.substr(0, 3);
         strings.emplace_back(ball_pos_x_string);
 
-        std::string ball_pos_y_string = map_string.substr(5, 5);
+        std::string ball_pos_y_string = map_string.substr(3, 3);
         strings.emplace_back(ball_pos_y_string);
 
-        std::string background_string = map_string.substr(10, map_string.length() - 8);
+        std::string background_string = map_string.substr(6, map_string.length() - 6);
         strings.emplace_back(background_string);
     }
     if (strings.size() == 3)
@@ -80,15 +81,15 @@ void Map::loadElements(std::string background_data)
 void Map::loadMapTextures()
 {
     //Grass [0]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\grass_light.jpg"));
+    textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
     //Sand [2]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\sand.jpg"));
+    textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
     //Water [3]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\water.jpg"));
+    textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
     //Wall [4]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\wall.jpg"));
+    textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
     //Hole [5]
-    textures.emplace_back(loadTexture("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Textures\\hole.png"));
+    textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
 }
 
 void Map::setTextures()
@@ -122,8 +123,40 @@ void Map::setTextures()
     }
 }
 
-Map::Map(std::string source_path)
+void Map::makeMenuBackground(int windowSizeX)
 {
+    this->menuBackground.setPosition(0.0, 0.0);
+    this->menuBackground.setSize(sf::Vector2f(windowSizeX, this->element_size));
+    this->menuBackground.setFillColor(sf::Color(255, 49, 49));
+    this->menuBackground.setOutlineColor(sf::Color(130, 6, 0));
+    this->menuBackground.setOutlineThickness(2.0);
+}
+
+void Map::makeText(std::string name, int windowSizeX)
+{
+    std::vector<std::string> strings = { name, "Number of strokes: ", std::to_string(this->strokeCounter) };
+    for (int i = 0; i < strings.size(); i++)
+    {
+        sf::Text text;
+        text.setCharacterSize(20.0);
+        text.setFillColor(sf::Color(255, 49, 49));
+        text.setOutlineColor(sf::Color(130, 6, 0));
+        text.setOutlineThickness(2.0);
+        text.setFont(this->font);
+        text.setString(strings[i]);
+        this->texts.emplace_back(text);
+    }
+    this->texts[0].setPosition(sf::Vector2f(0.0, 0.0));
+    this->texts[1].setPosition(sf::Vector2f(windowSizeX/2.0, 0.0));
+    this->texts[2].setPosition(sf::Vector2f(this->texts[1].getGlobalBounds().getPosition().x +
+        this->texts[1].getGlobalBounds().getSize().x, 0.0));
+}
+
+Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
+{
+    this->element_size = gridSize;
+    this->name = name;
+    std::string source_path = "..\\Maps\\" + this->name + ".txt";
     this->loadMapTextures();
 
     std::vector<std::string> data = readFile(source_path);
@@ -134,6 +167,17 @@ Map::Map(std::string source_path)
     this->ball = Ball(sf::Vector2f(ball_pos_x, ball_pos_y));
     
     this->setTextures();
+
+    this->makeMenuBackground(windowSizeX);
+
+    if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
+    {
+        std::cerr << "Couldnt load font" << std::endl;
+    }
+    else
+    {
+        this->makeText(name, windowSizeX);
+    }
 }
 
 int Map::getWidth()
@@ -149,7 +193,12 @@ int Map::getHeight()
 void Map::draw(sf::RenderWindow& window)
 {
     window.setView(getView());
-    for (const auto& el : elements)
+    window.draw(this->menuBackground);
+    for (auto el : this->texts)
+    {
+        window.draw(el);
+    }
+    for (const auto& el : this->elements)
     {
         window.draw(*el);
     }
@@ -198,6 +247,8 @@ char Map::run(sf::RenderWindow& window)
             if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
             {
                 this->ball.release(window);
+                this->strokeCounter++;
+                this->texts[2].setString(std::to_string(this->strokeCounter));
             }
         }
 
@@ -209,6 +260,10 @@ char Map::run(sf::RenderWindow& window)
         bool isHoleScored = collide();
         if (isHoleScored)
         {
+            std::string messageBoxString = "Map " + this->name + " \ncompleated in \n" + std::to_string(this->strokeCounter) +
+                " strokes!";
+            MessageBox messagebox = MessageBox(messageBoxString, "OK", window.getSize().x, window.getSize().y);
+            messagebox.run(window);
             return 'w';
         }
 
