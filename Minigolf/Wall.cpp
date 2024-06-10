@@ -7,7 +7,7 @@ Wall::Wall(sf::Vector2f position, float size)
 	this->setSize(sf::Vector2f(size, size));
 }
 
-bool Wall::collide(Ball& ball)
+int Wall::collide(Ball& ball)
 {
 	//detect collision
 	float testX = ball.getPosition().x;
@@ -35,25 +35,37 @@ bool Wall::collide(Ball& ball)
 	float distance = std::sqrt((distX * distX) + (distY * distY));
 	
 	//make collision
+	bool collision = false;
 	if (distance <= ball.getRadius())
 	{
 		if (testX == this->getPosition().x && distX < 0) // Left side
 		{
+			collision = true;
 			ball.setDirection(sf::Vector2f( - std::abs(ball.getDirection().x), ball.getDirection().y));
 		}
 		else if (testX == this->getPosition().x + this->getSize().x && distX > 0) // Right side
 		{
+			collision = true;
 			ball.setDirection(sf::Vector2f(std::abs(ball.getDirection().x), ball.getDirection().y));
 		}
 
 		if (testY == this->getPosition().y && distY < 0) // Top side
 		{
+			collision = true;
 			ball.setDirection(sf::Vector2f(ball.getDirection().x, -std::abs(ball.getDirection().y)));
 		}
 		else if (testY == this->getPosition().y + this->getSize().y && distY > 0) // Bottom side
 		{
+			collision = true;
 			ball.setDirection(sf::Vector2f(ball.getDirection().x, std::abs(ball.getDirection().y)));
 		}
 	}
-	return false;
+	if (collision)
+	{
+		return 2;
+	}
+	else
+	{
+		return -1;
+	}
 }

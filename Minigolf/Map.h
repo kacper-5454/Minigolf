@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include"Ball.h"
 #include"Screen.h"
 #include"BackgroundElement.h"
@@ -18,7 +19,11 @@ private:
 	sf::RectangleShape menuBackground;
 	sf::Font font;
 	std::vector<sf::Text> texts;
-	int strokeCounter =-1;
+	int strokeCounter =0;
+	std::vector<sf::SoundBuffer> sound_buffers;
+	std::vector<sf::Sound> sounds;
+	sf::RectangleShape backButton;
+	sf::Music music;
 public:
 	Map(int, int, std::string, float);
 	void loadMapTextures();
@@ -31,5 +36,8 @@ public:
 	void draw(sf::RenderWindow&);
 	char run(sf::RenderWindow&);
 	bool collide();
+	sf::SoundBuffer loadBuffer(std::string);
+	void loadBuffers();
+	void setSounds();
 };
 

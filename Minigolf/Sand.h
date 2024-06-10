@@ -6,6 +6,6 @@ class Sand : public BackgroundElement
 {
 public:
 	Sand(sf::Vector2f, float);
-	bool collide(Ball&);
+	int collide(Ball&);
 };
 

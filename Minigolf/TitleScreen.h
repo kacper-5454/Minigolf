@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include"Button.h"
 #include"Screen.h"
 class TitleScreen : public Screen
@@ -11,6 +12,7 @@ private:
 	Button create_button = Button("CREATE", sf::Vector2f(460.0, 270.0), sf::Vector2f(120.0, 60.0));
 	sf::Font font;
 	sf::Text title;
+	sf::Music music;
 public:
 	TitleScreen(int, int);
 	char run(sf::RenderWindow&);

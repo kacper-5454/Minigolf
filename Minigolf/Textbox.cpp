@@ -6,7 +6,7 @@ Textbox::Textbox(sf::Vector2f size, sf::Vector2f position)
 	this->setSize(size);
 	this->setPosition(position);
     this->setOutlineColor(sf::Color(130, 6, 0));
-    this->setOutlineThickness(5.0);
+    this->setOutlineThickness(-3.0);
     this->setFillColor(sf::Color::White);
 
 

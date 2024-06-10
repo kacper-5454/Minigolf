@@ -30,6 +30,12 @@ TitleScreen::TitleScreen(int windowSizeX, int windowSizeY)
     this->title.setFillColor(sf::Color(255, 49, 49));
     this->title.setOutlineThickness(5.0);
     this->title.setOutlineColor(sf::Color(130, 6, 0));
+    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
+    {
+        std::cerr << "Couldnt load intro music" << std::endl;
+    }
+    music.setLoop(true);
+    music.setVolume(25);
 }
 
 void TitleScreen::draw(sf::RenderWindow& window)
@@ -59,6 +65,7 @@ char TitleScreen::detectButton(sf::Vector2f mouse_pos_view)
 
 char TitleScreen::run(sf::RenderWindow& window)
 {
+    this->music.play();
     this->setView(window.getDefaultView());
     while (window.isOpen())
     {

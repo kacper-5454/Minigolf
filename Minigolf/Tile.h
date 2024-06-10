@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+
 class Tile : public sf::RectangleShape
 {
 private:
@@ -9,7 +11,7 @@ private:
 public:
 	Tile(sf::Vector2f, char, float);
 	void draw_icon(sf::RenderWindow&);
-	bool isClicked(sf::Vector2i);
+	bool isClicked(sf::Vector2i, sf::Sound*);
 	char getType();
     struct Comparator
     {

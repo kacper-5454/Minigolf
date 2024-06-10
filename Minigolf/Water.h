@@ -6,6 +6,6 @@ class Water : public BackgroundElement
 {
 public:
 	Water(sf::Vector2f, float);
-	bool collide(Ball&);
+	int collide(Ball&);
 };
 

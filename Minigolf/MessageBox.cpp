@@ -44,9 +44,10 @@ void MessageBox::draw_message(sf::RenderWindow& window)
     this->button.draw(window);
 }
 
-bool MessageBox::run(sf::RenderWindow& window)
+void MessageBox::run(sf::RenderWindow& window)
 {
-    while (window.isOpen())
+    bool run = true;
+    while (run)
     {
         sf::Event event;
         while (window.pollEvent(event))
@@ -62,7 +63,7 @@ bool MessageBox::run(sf::RenderWindow& window)
                 sf::Vector2f mouse_pos_view = window.mapPixelToCoords(mouse_pos, window.getView());
                 if (this->button.isClicked(mouse_pos_view))
                 {
-                    return true;
+                    run = false;
                 }
             }
         }

@@ -6,6 +6,6 @@ class Hole : public BackgroundElement
 {
 public:
 	Hole(sf::Vector2f, float);
-	bool collide(Ball&);
+	int collide(Ball&);
 };
 

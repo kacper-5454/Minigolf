@@ -82,14 +82,18 @@ void Map::loadMapTextures()
 {
     //Grass [0]
     textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
-    //Sand [2]
+    //Sand [1]
     textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
-    //Water [3]
+    //Water [2]
     textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
-    //Wall [4]
+    //Wall [3]
     textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
-    //Hole [5]
+    //Hole [4]
     textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
+    //Arrow [5]
+    textures.emplace_back(loadTexture("..\\Textures\\arrow.png"));
+    //Back Button Icon [6]
+    textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
 }
 
 void Map::setTextures()
@@ -146,10 +150,47 @@ void Map::makeText(std::string name, int windowSizeX)
         text.setString(strings[i]);
         this->texts.emplace_back(text);
     }
-    this->texts[0].setPosition(sf::Vector2f(0.0, 0.0));
+    this->texts[0].setPosition(sf::Vector2f(40.0, 0.0));
     this->texts[1].setPosition(sf::Vector2f(windowSizeX/2.0, 0.0));
     this->texts[2].setPosition(sf::Vector2f(this->texts[1].getGlobalBounds().getPosition().x +
         this->texts[1].getGlobalBounds().getSize().x, 0.0));
+}
+
+sf::SoundBuffer Map::loadBuffer(std::string path)
+{
+    sf::SoundBuffer buffer;
+    if (buffer.loadFromFile(path))
+    {
+        return buffer;
+    }
+    else
+    {
+        std::cerr << "Couldnt load sound from "<< path << std::endl;
+    }
+}
+
+void Map::loadBuffers()
+{
+    //Sand [0]
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\ball_in_sand.wav")); 
+    //Water [1]
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\water_splash.wav"));
+    //Wall [2]
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\wall_hit.wav"));
+    //Hole [3]
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\in_hole.wav"));
+    //Button [4]
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\button_click.wav"));
+}
+
+void Map::setSounds()
+{
+    for (auto &el : this->sound_buffers)
+    {
+        sf::Sound sound;
+        sound.setBuffer(el);
+        this->sounds.emplace_back(sound);
+    }
 }
 
 Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
@@ -161,13 +202,12 @@ Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
 
     std::vector<std::string> data = readFile(source_path);
     this->loadElements(data[2]);
+    this->setTextures();
 
     float ball_pos_x = std::stof(data[0]);
     float ball_pos_y = std::stof(data[1]);
-    this->ball = Ball(sf::Vector2f(ball_pos_x, ball_pos_y));
+    this->ball = Ball(sf::Vector2f(ball_pos_x, ball_pos_y), &this->textures[5]);
     
-    this->setTextures();
-
     this->makeMenuBackground(windowSizeX);
 
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
@@ -178,6 +218,20 @@ Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
     {
         this->makeText(name, windowSizeX);
     }
+
+    this->backButton.setTexture(&this->textures[6]);
+    this->backButton.setSize(sf::Vector2f(gridSize, gridSize));
+    this->backButton.setPosition(sf::Vector2f(0.0, 0.0));
+
+    loadBuffers();
+    setSounds();
+
+    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
+    {
+        std::cerr << "Couldnt load intro music" << std::endl;
+    }
+    music.setLoop(true);
+    music.setVolume(6);
 }
 
 int Map::getWidth()
@@ -194,6 +248,7 @@ void Map::draw(sf::RenderWindow& window)
 {
     window.setView(getView());
     window.draw(this->menuBackground);
+    window.draw(this->backButton);
     for (auto el : this->texts)
     {
         window.draw(el);
@@ -209,7 +264,26 @@ bool Map::collide()
 {
     for (auto &el : elements)
     {
-        if (el->collide(this->ball))
+        bool toPlay = true;
+        bool ballMoving = ball.getMoving();
+        int index = el->collide(this->ball);
+        if (index >= 0 && index < this->sounds.size())
+        {
+            for (auto& elm : sounds)
+            {
+                if (elm.getStatus() == sf::SoundSource::Status::Playing)
+                {
+                    toPlay = false;
+                }
+            }
+
+            if (ballMoving && toPlay)
+            {
+                this->sounds[index].play();
+            }
+        }
+
+        if (index == 3)
         {
             return true;
         }
@@ -221,11 +295,15 @@ char Map::run(sf::RenderWindow& window)
 {
     sf::Clock clock;
     sf::Time elapsed;
+    bool isLoadingTime = true;
+    float loadingTime = 1.0;
 
     this->setView(window.getDefaultView());
+    this->music.play();
 
     while (window.isOpen())
     {
+        elapsed = clock.restart();
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -238,24 +316,32 @@ char Map::run(sf::RenderWindow& window)
             {
                 handleResize(window);
             }
-               
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
-            {
-                this->ball.update_status(window);
-            }
 
-            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
+            if (!isLoadingTime && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
             {
+                if (!ball.getMoving())
+                {
+                    this->strokeCounter++;
+                }
                 this->ball.release(window);
-                this->strokeCounter++;
                 this->texts[2].setString(std::to_string(this->strokeCounter));
             }
         }
 
-        /*if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        if (!isLoadingTime && sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             this->ball.update_status(window);
-        }*/
+            if (this->backButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))))
+            {
+                this->sounds[4].play();
+                return 'm';
+            }
+        }
+
+        if (isLoadingTime && elapsed.asSeconds() - loadingTime < 0.0)
+        {
+            isLoadingTime = false;
+        }
 
         bool isHoleScored = collide();
         if (isHoleScored)
@@ -264,11 +350,10 @@ char Map::run(sf::RenderWindow& window)
                 " strokes!";
             MessageBox messagebox = MessageBox(messageBoxString, "OK", window.getSize().x, window.getSize().y);
             messagebox.run(window);
-            return 'w';
+            return 'm';
         }
 
         //moving
-        elapsed = clock.restart();
         float deltaSeconds = elapsed.asSeconds();
         this->ball.move_ball(deltaSeconds);
         
@@ -277,6 +362,6 @@ char Map::run(sf::RenderWindow& window)
         this->draw(window);
         window.display();
     }
-    return 'w';
+    return 'm';
 }
 

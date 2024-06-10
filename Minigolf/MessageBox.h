@@ -11,7 +11,8 @@ private:
 	Button button;
 public:
 	MessageBox(std::string, std::string, int, int);
+	MessageBox() = default;
 	void draw_message(sf::RenderWindow&);
-	bool run(sf::RenderWindow&);
+	void run(sf::RenderWindow&);
 };
 

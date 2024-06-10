@@ -1,11 +1,12 @@
 #include "Tile.h"
 #include<iostream>
 
-bool Tile::isClicked(sf::Vector2i mouse_pos)
+bool Tile::isClicked(sf::Vector2i mouse_pos, sf::Sound* sound)
 {
     sf::FloatRect bounds = this->getGlobalBounds();
     if (bounds.contains(static_cast<sf::Vector2f>(mouse_pos)))
     {
+        sound->play();
         return true;
     }
     else

@@ -10,7 +10,7 @@ void Creator::makeIcons()
     std::vector<char> types = { 'g', 's', 'w', 'a', 'h', 'b' };
     for (int i = 0; i < types.size(); i++)
     {
-        this->icons.emplace_back(Tile(sf::Vector2f(80.0+ i * 100.0, 0.0), types[i], this->gridSize));
+        this->icons.emplace_back(Tile(sf::Vector2f(120.0 + i * 90.0, 0.0), types[i], this->gridSize));
         this->icons[i].setTexture(&this->textures[i]);
     }
 }
@@ -24,6 +24,7 @@ void Creator::loadTextures()
     this->textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
     this->textures.emplace_back(loadTexture("..\\Textures\\ball_on_grass_light.png"));
     this->textures.emplace_back(loadTexture("..\\Textures\\save_icon.png"));
+    this->textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
 }
 
 void Creator::makeText()
@@ -40,7 +41,7 @@ void Creator::makeText()
         text.setOutlineColor(sf::Color(130, 6, 0));
         float text_offset_x = 40.0 - (text.getGlobalBounds().getSize().x) / 2.0;
         float text_offset_y = 10.0 - (text.getGlobalBounds().getSize().y) / 2.0;
-        text.setPosition(sf::Vector2f(i*100.0 + text_offset_x, text_offset_y));
+        text.setPosition(sf::Vector2f(45.0+i*90.0 + text_offset_x, text_offset_y));
         menuText.emplace_back(text);
     }
 }
@@ -81,7 +82,7 @@ void Creator::prefillGrid(int windowSizeX, int windowSizeY)
 }
 
 Creator::Creator(int windowSizeX, int windowSizeY, float gS):
-    textbox(sf::Vector2f(4 * gS, 0.9 * gS), sf::Vector2f(680.0, 0.0))
+    textbox(sf::Vector2f(4 * gS, gS), sf::Vector2f(windowSizeX-7*gS, 0.0))
 {
     this->gridSize = gS;
     this->isElementChosen = false;
@@ -92,15 +93,38 @@ Creator::Creator(int windowSizeX, int windowSizeY, float gS):
     }
     this->makeText();
     this->makeIcons();
+
     this->menuBackground.setSize(sf::Vector2f(windowSizeX, this->gridSize));
     this->menuBackground.setPosition(sf::Vector2f(0.0, 0.0));
     this->menuBackground.setFillColor(sf::Color(255, 49, 49));
     this->menuBackground.setOutlineColor(sf::Color(130, 6, 0));
     this->menuBackground.setOutlineThickness(2.0);
+
     this->saveButton.setTexture(&this->textures[6]);
     this->saveButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
-    this->saveButton.setPosition(sf::Vector2f(windowSizeX - this->gridSize, 0.0));
+    this->saveButton.setPosition(sf::Vector2f(windowSizeX - 2*this->gridSize, 0.0));
+
+    this->backButton.setTexture(&this->textures[7]);
+    this->backButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
+    this->backButton.setPosition(sf::Vector2f(0.0, 0.0));
+
     this->prefillGrid(windowSizeX, windowSizeY);
+
+    if (this->buffer.loadFromFile("..\\Sounds\\button_click.wav"))
+    {
+        this->sound.setBuffer(this->buffer);
+    }
+    else
+    {
+        std::cerr << "Couldnt load button sound" << std::endl;
+    }
+
+    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
+    {
+        std::cerr << "Couldnt load intro music" << std::endl;
+    }
+    music.setLoop(true);
+    music.setVolume(6);
 }
 
 void Creator::draw(sf::RenderWindow& window)
@@ -110,6 +134,7 @@ void Creator::draw(sf::RenderWindow& window)
 
     window.draw(this->menuBackground);
     window.draw(this->saveButton);
+    window.draw(this->backButton);
     this->textbox.draw(window);
 
     for (auto &el : this->icons)
@@ -317,6 +342,9 @@ void Creator::saveMap()
 char Creator::run(sf::RenderWindow& window)
 {
     this->setView(window.getDefaultView());
+    bool showMessageBox = false;
+
+    this->music.play();
 
     while (window.isOpen())
     {
@@ -333,53 +361,68 @@ char Creator::run(sf::RenderWindow& window)
                 handleResize(window);
             }
 
-            if (event.type == sf::Event::KeyPressed)
+            if (!showMessageBox)
             {
-                sf::Keyboard::Key keycode = event.key.code;
-                if (keycode >= sf::Keyboard::A && keycode <= sf::Keyboard::Z)
+                if (event.type == sf::Event::KeyPressed)
                 {
-                    char chr = static_cast<char>(keycode - sf::Keyboard::A + 'a');
-                    this->textbox.appendString(chr);
+                    sf::Keyboard::Key keycode = event.key.code;
+                    if (keycode >= sf::Keyboard::A && keycode <= sf::Keyboard::Z)
+                    {
+                        char chr = static_cast<char>(keycode - sf::Keyboard::A + 'a');
+                        this->textbox.appendString(chr);
+                    }
+                    if (keycode == sf::Keyboard::Key::Backspace)
+                    {
+                        this->textbox.backspace();
+                    }
                 }
-                if (keycode == sf::Keyboard::Key::Backspace)
+
+                if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
                 {
-                    this->textbox.backspace();
+                    sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+                    for (auto& el : icons)
+                    {
+                        if (el.isClicked(mouse_pos, &this->sound))
+                        {
+                            this->isElementChosen = true;
+                            this->currentElementToPlace = el.getType();
+                        }
+                    }
+
+                    sf::FloatRect bounds_save = this->saveButton.getGlobalBounds();
+                    if (bounds_save.contains(static_cast<sf::Vector2f>(mouse_pos)))
+                    {
+                        this->sound.play();
+                        if (validateMap(window.getSize().x, window.getSize().y))
+                        {
+                            saveMap();
+                            return 's';
+                        }
+                        else
+                        {
+                            showMessageBox = true;
+                        }
+                    }
+
+                    sf::FloatRect bounds_back = this->backButton.getGlobalBounds();
+                    if (bounds_back.contains(static_cast<sf::Vector2f>(mouse_pos)))
+                    {
+                        this->sound.play();
+                        return 'c';
+                    }
+
+                    if (this->isElementChosen)
+                    {
+                        calculateMousePosGrid(mouse_pos, window);
+                        placeOnScreen();
+                    }
                 }
             }
-
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+            else
             {
-                sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-                for (auto& el : icons)
-                {
-                    if (el.isClicked(mouse_pos))
-                    {
-                        this->isElementChosen = true;
-                        this->currentElementToPlace = el.getType();
-                    }
-                }
-
-                sf::FloatRect bounds = this->saveButton.getGlobalBounds();
-                if (bounds.contains(static_cast<sf::Vector2f>(mouse_pos)))
-                {
-                    if (validateMap(window.getSize().x, window.getSize().y))
-                    {
-                        saveMap();
-                        return 's';
-                    }
-                    else
-                    {
-                        MessageBox messageBox(this->currentErrorMessage, "OK", window.getSize().x, window.getSize().y);
-                        messageBox.run(window);
-                    }
-                    
-                }
-
-                if (this->isElementChosen)
-                {
-                    calculateMousePosGrid(mouse_pos, window);
-                    placeOnScreen();
-                }
+                MessageBox messageBox(this->currentErrorMessage, "OK", window.getSize().x, window.getSize().y);
+                messageBox.run(window);
+                showMessageBox = false;
             }
         }
 

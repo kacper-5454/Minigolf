@@ -7,6 +7,6 @@ class Grass : public BackgroundElement
 {
 public:
 	Grass(sf::Vector2f, float);
-	bool collide(Ball&);
+	int collide(Ball&);
 };
 

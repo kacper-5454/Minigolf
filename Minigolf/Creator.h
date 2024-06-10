@@ -21,9 +21,13 @@ private:
 	sf::Font font;
 	std::vector<sf::Text> menuText;
 	sf::RectangleShape saveButton;
+	sf::RectangleShape backButton;
 	sf::Vector2f ball_pos;
 	std::string currentErrorMessage = "No errors";
 	Textbox textbox;
+	sf::Sound sound;
+	sf::SoundBuffer buffer;
+	sf::Music music;
 public:
 	Creator(int, int, float);
 	char run(sf::RenderWindow&);

@@ -1,13 +1,14 @@
 #include "Ball.h"
 #include<iostream>
 
-Ball::Ball(sf::Vector2f initial_position)
+Ball::Ball(sf::Vector2f initial_position, sf::Texture* tex)
 {
-    this->setRadius(5.0);
+    this->setRadius(7.0);
 	this->setPosition(initial_position);
     this->setFillColor(sf::Color::White);
     this->setOutlineColor(sf::Color::Black);
-    this->setOutlineThickness(2.0);
+    this->setOutlineThickness(-2.0);
+    this->arrow.setArrowTexture(tex);
     this->arrow.update(initial_position, this->direction, this->speed, this->getRadius());
     this->last_position = initial_position;
 }
@@ -96,4 +97,9 @@ sf::Vector2f Ball::getLastPosition()
 void Ball::setMoving(bool iM)
 {
     this->isMoving = iM;
+}
+
+bool Ball::getMoving()
+{
+    return this->isMoving;
 }

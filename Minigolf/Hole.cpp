@@ -7,19 +7,19 @@ Hole::Hole(sf::Vector2f position, float size)
 	this->setSize(sf::Vector2f(size, size));
 }
 
-bool Hole::collide(Ball& ball)
+int Hole::collide(Ball& ball)
 {
 	sf::FloatRect hole_bounds = this->getGlobalBounds();
 	if (hole_bounds.contains(ball.getPosition()))
 	{
-		if(ball.getSpeed() < 100.0)
+		if(ball.getSpeed() < 150.0)
 		{
-			return true;
+			return 3;
 		}
 		else
 		{
 			ball.setFriction(50.0);
 		}	
 	}
-	return false;
+	return -1;
 }

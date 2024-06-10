@@ -15,7 +15,7 @@ private:
 	Arrow arrow;
 	sf::Vector2f last_position = sf::Vector2f(0.0, 0.0);
 public:
-	Ball(sf::Vector2f);
+	Ball(sf::Vector2f, sf::Texture*);
 	Ball() = default;
 	void update_status(sf::RenderWindow&);
 	void release(sf::RenderWindow&);
@@ -28,4 +28,5 @@ public:
 	float getSpeed();
 	sf::Vector2f getLastPosition();
 	void setMoving(bool);
+	bool getMoving();
 };
