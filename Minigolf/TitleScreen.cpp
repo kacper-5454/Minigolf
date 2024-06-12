@@ -63,7 +63,7 @@ char TitleScreen::detectButton(sf::Vector2f mouse_pos_view)
     }
 }
 
-char TitleScreen::run(sf::RenderWindow& window)
+std::string TitleScreen::run(sf::RenderWindow& window)
 {
     this->music.play();
     this->setView(window.getDefaultView());
@@ -92,10 +92,10 @@ char TitleScreen::run(sf::RenderWindow& window)
                     switch (whichButton)
                     {
                     case 'p':
-                        return 'p';
+                        return "play";
                         break;
                     case 'c':
-                        return 'c';
+                        return "create";
                         break;
                     case 'n':
                         break;
@@ -110,4 +110,5 @@ char TitleScreen::run(sf::RenderWindow& window)
         this->draw(window);
         window.display();
     }
+    return "";
 }

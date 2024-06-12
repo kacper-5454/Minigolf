@@ -81,10 +81,10 @@ void Creator::prefillGrid(int windowSizeX, int windowSizeY)
     }
 }
 
-Creator::Creator(int windowSizeX, int windowSizeY, float gS):
-    textbox(sf::Vector2f(4 * gS, gS), sf::Vector2f(windowSizeX-7*gS, 0.0))
+Creator::Creator(int windowSizeX, int windowSizeY):
+    textbox(sf::Vector2f(80.0, 20.0), sf::Vector2f(windowSizeX- 140.0, 0.0))
 {
-    this->gridSize = gS;
+    this->gridSize = 20.0;
     this->isElementChosen = false;
     this->loadTextures();
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
@@ -271,11 +271,8 @@ bool Creator::validateMap(int windowSizeX, int windowSizeY)
 
 void Creator::saveMap()
 {
-    std::string file_path = "..\\Maps\\" + this->textbox.getString() + ".txt";
-    std::ofstream file(file_path);
     std::string ball_pos_x_string = std::to_string(static_cast<int>(this->ball_pos.x));
     std::string ball_pos_y_string = std::to_string(static_cast<int>(this->ball_pos.y));
-    std::cout << ball_pos_x_string << " " << ball_pos_y_string << std::endl;
 
     if (this->ball_pos.x < 100.0)
     {
@@ -302,8 +299,9 @@ void Creator::saveMap()
 
     std::string ball_pos_string = ball_pos_x_string + ball_pos_y_string;
 
+    std::string file_path = "..\\Maps\\" + this->textbox.getString() + ".txt";
+    std::ofstream file(file_path);
     file << ball_pos_string;
-
     for (auto el : tiles)
     {
         if (el.getPosition().x == 0.0)
@@ -337,9 +335,14 @@ void Creator::saveMap()
         }
     }
     file.close();
+
+    std::ofstream name_file;
+    name_file.open("..\\Maps\\map names.txt", std::ios::app);
+    name_file << "\n" << this->textbox.getString();
+    name_file.close();
 }
 
-char Creator::run(sf::RenderWindow& window)
+std::string Creator::run(sf::RenderWindow& window)
 {
     this->setView(window.getDefaultView());
     bool showMessageBox = false;
@@ -396,7 +399,7 @@ char Creator::run(sf::RenderWindow& window)
                         if (validateMap(window.getSize().x, window.getSize().y))
                         {
                             saveMap();
-                            return 's';
+                            return "save";
                         }
                         else
                         {
@@ -408,7 +411,7 @@ char Creator::run(sf::RenderWindow& window)
                     if (bounds_back.contains(static_cast<sf::Vector2f>(mouse_pos)))
                     {
                         this->sound.play();
-                        return 'c';
+                        return "back";
                     }
 
                     if (this->isElementChosen)
@@ -431,5 +434,5 @@ char Creator::run(sf::RenderWindow& window)
         this->draw(window);
         window.display();
     }
-	return 'c';
+    return "";
 }

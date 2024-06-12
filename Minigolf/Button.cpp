@@ -16,14 +16,14 @@ Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size
 
     if (this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
-        this->text.setFont(font);
+        this->text.setFont(this->font);
     }
     else
     {
         std::cerr << "Couldnt load font while creating button" << std::endl;
     }
     this->text.setString(text_string);
-    this->text.setCharacterSize(20.0);
+    this->text.setCharacterSize(size.y/2.0);
     this->text.setFillColor(sf::Color(255, 49, 49));
     this->text.setOutlineThickness(2.0);
     this->text.setOutlineColor(sf::Color(130, 6, 0));

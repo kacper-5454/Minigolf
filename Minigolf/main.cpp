@@ -5,40 +5,38 @@
 #include"Map.h"
 #include"TitleScreen.h"
 #include"Creator.h"
-
-
+#include"Menu.h"
 
 int main()
 {
     int windowSizeX = 800;
     int windowSizeY = 450;
-    float gridSize = 20.0;
     sf::RenderWindow window(sf::VideoMode(windowSizeX, windowSizeY), "Minigolf");
     window.setFramerateLimit(60);
 
     std::unique_ptr<Screen> currentScreen;
-    char button;
+    std::string return_text;
 
     while (window.isOpen())
     {
         currentScreen = std::make_unique<TitleScreen>(windowSizeX, windowSizeY);
-        button = currentScreen->run(window);
+        return_text = currentScreen->run(window);
 
-        switch (button)
+        if (return_text == "play")
         {
-        case 'p':
-            // Move to level-choosing menu
-            currentScreen = std::make_unique<Map>(windowSizeX, windowSizeY, "easy", gridSize);
+            currentScreen = std::make_unique<Menu>(windowSizeX, windowSizeY);
+            return_text = currentScreen->run(window);
+            if (return_text != "back")
+            {
+                currentScreen = std::make_unique<Map>(windowSizeX, windowSizeY, return_text);
+                currentScreen->run(window);
+            }
+            
+        }
+        else if (return_text == "create")
+        {
+            currentScreen = std::make_unique<Creator>(windowSizeX, windowSizeY);
             currentScreen->run(window);
-            // Back to title screen after level choosing
-            break;
-        case 'c':
-            currentScreen = std::make_unique<Creator>(windowSizeX, windowSizeY, gridSize);
-            currentScreen->run(window);
-            break;
-        default:
-            std::cerr << "Unidentified button clicked" << std::endl;
-            break;
         }
     }
 

@@ -29,8 +29,8 @@ private:
 	sf::SoundBuffer buffer;
 	sf::Music music;
 public:
-	Creator(int, int, float);
-	char run(sf::RenderWindow&);
+	Creator(int, int);
+	std::string run(sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	void calculateMousePosGrid(sf::Vector2i, sf::RenderWindow&);
 	void makeIcons();
@@ -40,6 +40,6 @@ public:
 	void makeText();
 	void prefillGrid(int, int);
 	bool validateMap(int, int);
-	void saveMap();;
+	void saveMap();
 };
 

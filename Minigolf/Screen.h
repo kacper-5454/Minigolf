@@ -7,7 +7,7 @@ private:
 	sf::View view;
 public:
 	virtual ~Screen() = default;
-	virtual char run(sf::RenderWindow& window) = 0;
+	virtual std::string run(sf::RenderWindow& window) = 0;
 	sf::Texture loadTexture(std::string);
 	void handleResize(const sf::RenderWindow& window);
 	sf::View getView();

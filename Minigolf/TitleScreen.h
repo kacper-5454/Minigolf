@@ -15,7 +15,7 @@ private:
 	sf::Music music;
 public:
 	TitleScreen(int, int);
-	char run(sf::RenderWindow&);
+	std::string run(sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	char detectButton(sf::Vector2f);
 };

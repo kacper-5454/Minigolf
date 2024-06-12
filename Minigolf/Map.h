@@ -11,7 +11,7 @@ class Map : public Screen
 private:
 	std::vector<sf::Texture> textures;
 	std::vector<std::unique_ptr<BackgroundElement>> elements;
-	float element_size;
+	float gridSize=20.0;
 	int width;
 	int height;
 	Ball ball;
@@ -25,16 +25,14 @@ private:
 	sf::RectangleShape backButton;
 	sf::Music music;
 public:
-	Map(int, int, std::string, float);
+	Map(int, int, std::string);
 	void loadMapTextures();
 	void loadElements(std::string);
 	void setTextures();
 	void makeMenuBackground(int);
 	void makeText(std::string, int);
-	int getWidth();
-	int getHeight();
 	void draw(sf::RenderWindow&);
-	char run(sf::RenderWindow&);
+	std::string run(sf::RenderWindow&);
 	bool collide();
 	sf::SoundBuffer loadBuffer(std::string);
 	void loadBuffers();

@@ -49,31 +49,31 @@ void Map::loadElements(std::string background_data)
         switch (background_data[i])
         {
         case 'g':
-            this->elements.emplace_back(std::make_unique<Grass>(Grass(sf::Vector2f(x_pos, y_pos), element_size)));
+            this->elements.emplace_back(std::make_unique<Grass>(Grass(sf::Vector2f(x_pos, y_pos), this->gridSize)));
             break;
         case 's':
-            this->elements.emplace_back(std::make_unique <Sand>(Sand(sf::Vector2f(x_pos, y_pos), element_size)));
+            this->elements.emplace_back(std::make_unique <Sand>(Sand(sf::Vector2f(x_pos, y_pos), this->gridSize)));
             break;
         case 'a':
-            this->elements.emplace_back(std::make_unique <Water>(Water(sf::Vector2f(x_pos, y_pos), element_size)));
+            this->elements.emplace_back(std::make_unique <Water>(Water(sf::Vector2f(x_pos, y_pos), this->gridSize)));
             break;
         case 'w':
-            this->elements.emplace_back(std::make_unique<Wall>(Wall(sf::Vector2f(x_pos, y_pos), element_size)));
+            this->elements.emplace_back(std::make_unique<Wall>(Wall(sf::Vector2f(x_pos, y_pos), this->gridSize)));
             break;
         case 'h':
-            this->elements.emplace_back(std::make_unique<Hole>(Hole(sf::Vector2f(x_pos, y_pos), element_size)));
+            this->elements.emplace_back(std::make_unique<Hole>(Hole(sf::Vector2f(x_pos, y_pos), this->gridSize)));
             break;
         case 'n':
-            this->width = x_pos + element_size;
-            x_pos = -element_size;
-            y_pos += element_size;
+            this->width = x_pos + this->gridSize;
+            x_pos = -this->gridSize;
+            y_pos += this->gridSize;
             break;
         default:
             std::cerr << "Error in map data" << std::endl;
             break;
         }
-        x_pos += element_size;
-        this->height = y_pos + element_size;
+        x_pos += this->gridSize;
+        this->height = y_pos + this->gridSize;
     }
 
 }
@@ -130,7 +130,7 @@ void Map::setTextures()
 void Map::makeMenuBackground(int windowSizeX)
 {
     this->menuBackground.setPosition(0.0, 0.0);
-    this->menuBackground.setSize(sf::Vector2f(windowSizeX, this->element_size));
+    this->menuBackground.setSize(sf::Vector2f(windowSizeX, this->gridSize));
     this->menuBackground.setFillColor(sf::Color(255, 49, 49));
     this->menuBackground.setOutlineColor(sf::Color(130, 6, 0));
     this->menuBackground.setOutlineThickness(2.0);
@@ -193,9 +193,8 @@ void Map::setSounds()
     }
 }
 
-Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
+Map::Map(int windowSizeX, int windowSizeY, std::string name)
 {
-    this->element_size = gridSize;
     this->name = name;
     std::string source_path = "..\\Maps\\" + this->name + ".txt";
     this->loadMapTextures();
@@ -220,7 +219,7 @@ Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
     }
 
     this->backButton.setTexture(&this->textures[6]);
-    this->backButton.setSize(sf::Vector2f(gridSize, gridSize));
+    this->backButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
     this->backButton.setPosition(sf::Vector2f(0.0, 0.0));
 
     loadBuffers();
@@ -232,16 +231,6 @@ Map::Map(int windowSizeX, int windowSizeY, std::string name, float gridSize)
     }
     music.setLoop(true);
     music.setVolume(6);
-}
-
-int Map::getWidth()
-{
-    return this->width;
-}
-
-int Map::getHeight()
-{
-    return this->height;
 }
 
 void Map::draw(sf::RenderWindow& window)
@@ -291,7 +280,7 @@ bool Map::collide()
     return false;
 }
 
-char Map::run(sf::RenderWindow& window)
+std::string Map::run(sf::RenderWindow& window)
 {
     sf::Clock clock;
     sf::Time elapsed;
@@ -334,7 +323,7 @@ char Map::run(sf::RenderWindow& window)
             if (this->backButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))))
             {
                 this->sounds[4].play();
-                return 'm';
+                return "back";
             }
         }
 
@@ -350,7 +339,7 @@ char Map::run(sf::RenderWindow& window)
                 " strokes!";
             MessageBox messagebox = MessageBox(messageBoxString, "OK", window.getSize().x, window.getSize().y);
             messagebox.run(window);
-            return 'm';
+            return "won";
         }
 
         //moving
@@ -362,6 +351,6 @@ char Map::run(sf::RenderWindow& window)
         this->draw(window);
         window.display();
     }
-    return 'm';
+    return "";
 }
 
