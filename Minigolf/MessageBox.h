@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include"Button.h"
+
 class MessageBox : sf::RectangleShape
 {
 private:
@@ -10,9 +11,10 @@ private:
 	sf::Text text;
 	Button button;
 public:
-	MessageBox(std::string, std::string, int, int);
+	MessageBox(std::string, std::string, sf::RenderWindow&);
 	MessageBox() = default;
 	void draw_message(sf::RenderWindow&);
 	void run(sf::RenderWindow&);
+	void makeText(std::string);
 };
 

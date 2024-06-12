@@ -9,7 +9,8 @@ private:
 	sf::Text text;
 	std::string text_string;
 public:
-	Textbox(sf::Vector2f, sf::Vector2f);
+	Textbox(sf::Vector2f, sf::Vector2f, sf::RenderWindow&);
+	void setupText(sf::Vector2f, sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	void appendString(char);
 	std::string getString();

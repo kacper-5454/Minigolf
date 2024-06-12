@@ -1,6 +1,7 @@
 #include "Menu.h"
 #include<iostream>
 #include<fstream>
+#include"MessageBox.h"
 
 std::vector<std::string> Menu::readContentFile(std::string source_path)
 {
@@ -28,7 +29,7 @@ void Menu::makeTitle(int windowSizeX, int windowSizeY)
     this->title.setPosition(windowSizeX / 2.0 - this->title.getGlobalBounds().width / 2.0, 30.0);
 }
 
-void Menu::makeText(std::vector<std::string>& strings, int windowSizeX, int windowSizeY)
+std::vector<sf::Text> Menu::setupTexts(std::vector<std::string>& strings)
 {
     std::vector<sf::Text> texts;
     for (const auto& str : strings)
@@ -42,8 +43,11 @@ void Menu::makeText(std::vector<std::string>& strings, int windowSizeX, int wind
         text.setString(str);
         texts.emplace_back(text);
     }
+    return texts;
+}
 
-    int elementsToDisplay = std::min(21, static_cast<int>(texts.size()));
+void Menu::setTextsPositions(std::vector<sf::Text>& texts, int elementsToDisplay)
+{
     for (int i = 0; i < elementsToDisplay; i++)
     {
         if (i <= 6)
@@ -59,7 +63,10 @@ void Menu::makeText(std::vector<std::string>& strings, int windowSizeX, int wind
             texts[i].setPosition(550, 100 + (i - 14) * 40);
         }
     }
+}
 
+void Menu::updateBuffers(std::vector<sf::Text>& texts, int elementsToDisplay)
+{
     this->currentText.assign(texts.begin(), texts.begin() + elementsToDisplay);
     if (texts.size() > elementsToDisplay)
     {
@@ -72,34 +79,45 @@ void Menu::makeText(std::vector<std::string>& strings, int windowSizeX, int wind
     this->back_map_buffer.clear();
 }
 
-Menu::Menu(int windowSizeX, int windowSizeY)
+void Menu::makeText(std::vector<std::string>& strings, int windowSizeX, int windowSizeY)
 {
-    this->setSize(sf::Vector2f(windowSizeX, windowSizeY));
+    std::vector<sf::Text> texts = this->setupTexts(strings);
+    int elementsToDisplay = std::min(21, static_cast<int>(texts.size()));
+    this->setTextsPositions(texts, elementsToDisplay);
+    this->updateBuffers(texts, elementsToDisplay);
+}
+
+Menu::Menu(sf::RenderWindow& window) :
+    backButton(sf::Vector2f(20.0, 20.0), window),
+    backArrow(sf::Vector2f(50.0, window.getSize().y - 50.0), window),
+    frontArrow(sf::Vector2f(window.getSize().x - 50.0, window.getSize().y - 30.0), window)
+{
+    this->setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     this->setPosition(sf::Vector2f(0.0, 0.0));
-	this->texture = this->loadTexture("..\\Textures\\menu_background.jpg");
+    try
+    {
+        this->texture = this->loadTexture("..\\Textures\\menu_background.jpg");
+    }
+    catch (...)
+    {
+        MessageBox messageBox("Couldn't load Menu background", "OK", window);
+        messageBox.run(window);
+        window.close();
+    }
+
 	this->setTexture(&this->texture);
 
-	this->backButton_texture = this->loadTexture("..\\Textures\\back_arrow.png");
-	this->backButton.setTexture(&this->backButton_texture);
-	this->backButton.setSize(sf::Vector2f(20.0, 20.0));
-	this->backButton.setPosition(sf::Vector2f(20.0, 20.0));
-
-    this->backArrow.setTexture(&this->backButton_texture);
-    this->backArrow.setSize(sf::Vector2f(20.0, 20.0));
-    this->backArrow.setPosition(sf::Vector2f(50.0, windowSizeY-50.0));
-
-    this->frontArrow.setTexture(&this->backButton_texture);
-    this->frontArrow.setSize(sf::Vector2f(20.0, 20.0));
     this->frontArrow.setRotation(180);
-    this->frontArrow.setPosition(sf::Vector2f(windowSizeX - 50.0, windowSizeY - 30.0));
 
 	std::vector<std::string> name_strings = readContentFile("..\\Maps\\map names.txt");
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
-        std::cerr << "Couldnt load font" << std::endl;
+        MessageBox messageBox("Couldn't load font", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
-    makeTitle(windowSizeX, windowSizeY);
-    makeText(name_strings, windowSizeX, windowSizeX);
+    makeTitle(window.getSize().x, window.getSize().y);
+    makeText(name_strings, window.getSize().x, window.getSize().y);
 
     if (this->buffer.loadFromFile("..\\Sounds\\button_click.wav"))
     {
@@ -107,15 +125,10 @@ Menu::Menu(int windowSizeX, int windowSizeY)
     }
     else
     {
-        std::cerr << "Couldnt load button sound" << std::endl;
+        MessageBox messageBox("Couldn't load Menu sound buffer", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
-
-    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
-    {
-        std::cerr << "Couldnt load intro music" << std::endl;
-    }
-    music.setLoop(true);
-    music.setVolume(6);
 }
 
 void Menu::draw_menu(sf::RenderWindow& window)
@@ -191,8 +204,6 @@ void Menu::goFront()
 
 std::string Menu::run(sf::RenderWindow& window)
 {
-    this->setView(window.getDefaultView());
-    this->music.play();
     while (window.isOpen())
     {
         sf::Event event;
@@ -201,11 +212,6 @@ std::string Menu::run(sf::RenderWindow& window)
             if (event.type == sf::Event::Closed)
             {
                 window.close();
-            }
-
-            if (event.type == sf::Event::Resized)
-            {
-                handleResize(window);
             }
 
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
@@ -230,6 +236,7 @@ std::string Menu::run(sf::RenderWindow& window)
                 {
                     if (el.getGlobalBounds().contains(static_cast<sf::Vector2f>(mouse_pos)))
                     {
+                        this->sound.play();
                         return static_cast<std::string>(el.getString());
                     }
                 }

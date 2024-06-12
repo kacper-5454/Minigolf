@@ -15,16 +15,26 @@ void Creator::makeIcons()
     }
 }
 
-void Creator::loadTextures()
+void Creator::loadTextures(sf::RenderWindow& window)
 {
-    this->textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\ball_on_grass_light.png"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\save_icon.png"));
-    this->textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
+    try
+    {
+        this->textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\ball_on_grass_light.png"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\save_icon.png"));
+        this->textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
+    }
+    catch(...)
+    {
+        MessageBox messageBox("Couldn't Creator textures", "OK", window);
+        messageBox.run(window);
+        window.close();
+    }
+
 }
 
 void Creator::makeText()
@@ -81,20 +91,23 @@ void Creator::prefillGrid(int windowSizeX, int windowSizeY)
     }
 }
 
-Creator::Creator(int windowSizeX, int windowSizeY):
-    textbox(sf::Vector2f(80.0, 20.0), sf::Vector2f(windowSizeX- 140.0, 0.0))
+Creator::Creator(sf::RenderWindow& window) :
+    textbox(sf::Vector2f(80.0, 20.0), sf::Vector2f(window.getSize().x- 140.0, 0.0), window),
+    backButton(sf::Vector2f(0.0, 0.0), window)
 {
     this->gridSize = 20.0;
     this->isElementChosen = false;
-    this->loadTextures();
+    this->loadTextures(window);
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
-        std::cerr << "Couldnt load font" << std::endl;
+        MessageBox messageBox("Couldn't load font", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
     this->makeText();
     this->makeIcons();
 
-    this->menuBackground.setSize(sf::Vector2f(windowSizeX, this->gridSize));
+    this->menuBackground.setSize(sf::Vector2f(window.getSize().x, this->gridSize));
     this->menuBackground.setPosition(sf::Vector2f(0.0, 0.0));
     this->menuBackground.setFillColor(sf::Color(255, 49, 49));
     this->menuBackground.setOutlineColor(sf::Color(130, 6, 0));
@@ -102,13 +115,9 @@ Creator::Creator(int windowSizeX, int windowSizeY):
 
     this->saveButton.setTexture(&this->textures[6]);
     this->saveButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
-    this->saveButton.setPosition(sf::Vector2f(windowSizeX - 2*this->gridSize, 0.0));
+    this->saveButton.setPosition(sf::Vector2f(window.getSize().x - 2*this->gridSize, 0.0));
 
-    this->backButton.setTexture(&this->textures[7]);
-    this->backButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
-    this->backButton.setPosition(sf::Vector2f(0.0, 0.0));
-
-    this->prefillGrid(windowSizeX, windowSizeY);
+    this->prefillGrid(window.getSize().x, window.getSize().y);
 
     if (this->buffer.loadFromFile("..\\Sounds\\button_click.wav"))
     {
@@ -116,20 +125,14 @@ Creator::Creator(int windowSizeX, int windowSizeY):
     }
     else
     {
-        std::cerr << "Couldnt load button sound" << std::endl;
+        MessageBox messageBox("Couldn't load Creator sound buffer", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
-
-    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
-    {
-        std::cerr << "Couldnt load intro music" << std::endl;
-    }
-    music.setLoop(true);
-    music.setVolume(6);
 }
 
 void Creator::draw(sf::RenderWindow& window)
 {
-    window.setView(getView());
     window.draw(grid);
 
     window.draw(this->menuBackground);
@@ -344,10 +347,7 @@ void Creator::saveMap()
 
 std::string Creator::run(sf::RenderWindow& window)
 {
-    this->setView(window.getDefaultView());
     bool showMessageBox = false;
-
-    this->music.play();
 
     while (window.isOpen())
     {
@@ -357,11 +357,6 @@ std::string Creator::run(sf::RenderWindow& window)
             if (event.type == sf::Event::Closed)
             {
                 window.close();
-            }
-
-            if (event.type == sf::Event::Resized)
-            {
-                handleResize(window);
             }
 
             if (!showMessageBox)
@@ -423,13 +418,12 @@ std::string Creator::run(sf::RenderWindow& window)
             }
             else
             {
-                MessageBox messageBox(this->currentErrorMessage, "OK", window.getSize().x, window.getSize().y);
+                MessageBox messageBox(this->currentErrorMessage, "OK", window);
                 messageBox.run(window);
                 showMessageBox = false;
             }
         }
 
-        //drawing and displaying
         window.clear(sf::Color::Black);
         this->draw(window);
         window.display();

@@ -10,7 +10,7 @@
 #include<fstream>
 #include<sstream>
 
-std::vector<std::string> readFile(std::string source_path)
+std::vector<std::string> readFile(std::string source_path, sf::RenderWindow& window)
 {
     std::vector<std::string> strings;
     std::fstream map_file(source_path);
@@ -36,7 +36,9 @@ std::vector<std::string> readFile(std::string source_path)
     }
     else
     {
-        std::cerr << "Data vector contains wrong number of elements" << std::endl;
+        MessageBox messageBox("Map's data is incomplete", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
 }
 
@@ -78,22 +80,32 @@ void Map::loadElements(std::string background_data)
 
 }
 
-void Map::loadMapTextures()
+void Map::loadMapTextures(sf::RenderWindow& window)
 {
-    //Grass [0]
-    textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
-    //Sand [1]
-    textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
-    //Water [2]
-    textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
-    //Wall [3]
-    textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
-    //Hole [4]
-    textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
-    //Arrow [5]
-    textures.emplace_back(loadTexture("..\\Textures\\arrow.png"));
-    //Back Button Icon [6]
-    textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
+    try
+    {
+        //Grass [0]
+        textures.emplace_back(loadTexture("..\\Textures\\grass_light.jpg"));
+        //Sand [1]
+        textures.emplace_back(loadTexture("..\\Textures\\sand.jpg"));
+        //Water [2]
+        textures.emplace_back(loadTexture("..\\Textures\\water.jpg"));
+        //Wall [3]
+        textures.emplace_back(loadTexture("..\\Textures\\wall.jpg"));
+        //Hole [4]
+        textures.emplace_back(loadTexture("..\\Textures\\hole.png"));
+        //Arrow [5]
+        textures.emplace_back(loadTexture("..\\Textures\\arrow.png"));
+        //Back Button Icon [6]
+        textures.emplace_back(loadTexture("..\\Textures\\back_arrow.png"));
+    }
+    catch (...)
+    {
+        MessageBox messageBox("Couldn't load map textures", "OK", window);
+        messageBox.run(window);
+        window.close();
+    }
+
 }
 
 void Map::setTextures()
@@ -156,7 +168,7 @@ void Map::makeText(std::string name, int windowSizeX)
         this->texts[1].getGlobalBounds().getSize().x, 0.0));
 }
 
-sf::SoundBuffer Map::loadBuffer(std::string path)
+sf::SoundBuffer Map::loadBuffer(std::string path, sf::RenderWindow& window)
 {
     sf::SoundBuffer buffer;
     if (buffer.loadFromFile(path))
@@ -165,22 +177,24 @@ sf::SoundBuffer Map::loadBuffer(std::string path)
     }
     else
     {
-        std::cerr << "Couldnt load sound from "<< path << std::endl;
+        MessageBox messageBox("Couldn't load map sound buffer", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
 }
 
-void Map::loadBuffers()
+void Map::loadBuffers(sf::RenderWindow& window)
 {
     //Sand [0]
-    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\ball_in_sand.wav")); 
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\ball_in_sand.wav", window));
     //Water [1]
-    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\water_splash.wav"));
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\water_splash.wav", window));
     //Wall [2]
-    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\wall_hit.wav"));
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\wall_hit.wav", window));
     //Hole [3]
-    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\in_hole.wav"));
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\in_hole.wav", window));
     //Button [4]
-    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\button_click.wav"));
+    this->sound_buffers.emplace_back(loadBuffer("..\\Sounds\\button_click.wav", window));
 }
 
 void Map::setSounds()
@@ -193,13 +207,13 @@ void Map::setSounds()
     }
 }
 
-Map::Map(int windowSizeX, int windowSizeY, std::string name)
+Map::Map(std::string name, sf::RenderWindow& window)
 {
     this->name = name;
     std::string source_path = "..\\Maps\\" + this->name + ".txt";
-    this->loadMapTextures();
+    this->loadMapTextures(window);
 
-    std::vector<std::string> data = readFile(source_path);
+    std::vector<std::string> data = readFile(source_path, window);
     this->loadElements(data[2]);
     this->setTextures();
 
@@ -207,35 +221,29 @@ Map::Map(int windowSizeX, int windowSizeY, std::string name)
     float ball_pos_y = std::stof(data[1]);
     this->ball = Ball(sf::Vector2f(ball_pos_x, ball_pos_y), &this->textures[5]);
     
-    this->makeMenuBackground(windowSizeX);
+    this->makeMenuBackground(window.getSize().x);
 
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
-        std::cerr << "Couldnt load font" << std::endl;
+        MessageBox messageBox("Couldn't load font", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
     else
     {
-        this->makeText(name, windowSizeX);
+        this->makeText(name, window.getSize().x);
     }
 
     this->backButton.setTexture(&this->textures[6]);
     this->backButton.setSize(sf::Vector2f(this->gridSize, this->gridSize));
     this->backButton.setPosition(sf::Vector2f(0.0, 0.0));
 
-    loadBuffers();
+    loadBuffers(window);
     setSounds();
-
-    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
-    {
-        std::cerr << "Couldnt load intro music" << std::endl;
-    }
-    music.setLoop(true);
-    music.setVolume(6);
 }
 
 void Map::draw(sf::RenderWindow& window)
 {
-    window.setView(getView());
     window.draw(this->menuBackground);
     window.draw(this->backButton);
     for (auto el : this->texts)
@@ -287,9 +295,6 @@ std::string Map::run(sf::RenderWindow& window)
     bool isLoadingTime = true;
     float loadingTime = 1.0;
 
-    this->setView(window.getDefaultView());
-    this->music.play();
-
     while (window.isOpen())
     {
         elapsed = clock.restart();
@@ -299,11 +304,6 @@ std::string Map::run(sf::RenderWindow& window)
             if (event.type == sf::Event::Closed)
             {
                 window.close();
-            }
-
-            if (event.type == sf::Event::Resized)
-            {
-                handleResize(window);
             }
 
             if (!isLoadingTime && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
@@ -327,7 +327,8 @@ std::string Map::run(sf::RenderWindow& window)
             }
         }
 
-        if (isLoadingTime && elapsed.asSeconds() - loadingTime < 0.0)
+        loadingTime = loadingTime - elapsed.asSeconds();
+        if (isLoadingTime && loadingTime < 0.0)
         {
             isLoadingTime = false;
         }
@@ -337,16 +338,14 @@ std::string Map::run(sf::RenderWindow& window)
         {
             std::string messageBoxString = "Map " + this->name + " \ncompleated in \n" + std::to_string(this->strokeCounter) +
                 " strokes!";
-            MessageBox messagebox = MessageBox(messageBoxString, "OK", window.getSize().x, window.getSize().y);
+            MessageBox messagebox = MessageBox(messageBoxString, "OK", window);
             messagebox.run(window);
             return "won";
         }
 
-        //moving
         float deltaSeconds = elapsed.asSeconds();
         this->ball.move_ball(deltaSeconds);
         
-        //drawing and displaying
         window.clear(sf::Color::Black);
         this->draw(window);
         window.display();

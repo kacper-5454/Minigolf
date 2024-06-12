@@ -17,16 +17,14 @@ private:
 	Ball ball;
 	std::string name;
 	sf::RectangleShape menuBackground;
-	sf::Font font;
 	std::vector<sf::Text> texts;
 	int strokeCounter =0;
 	std::vector<sf::SoundBuffer> sound_buffers;
 	std::vector<sf::Sound> sounds;
 	sf::RectangleShape backButton;
-	sf::Music music;
 public:
-	Map(int, int, std::string);
-	void loadMapTextures();
+	Map(std::string, sf::RenderWindow&);
+	void loadMapTextures(sf::RenderWindow&);
 	void loadElements(std::string);
 	void setTextures();
 	void makeMenuBackground(int);
@@ -34,8 +32,8 @@ public:
 	void draw(sf::RenderWindow&);
 	std::string run(sf::RenderWindow&);
 	bool collide();
-	sf::SoundBuffer loadBuffer(std::string);
-	void loadBuffers();
+	sf::SoundBuffer loadBuffer(std::string, sf::RenderWindow&);
+	void loadBuffers(sf::RenderWindow&);
 	void setSounds();
 };
 

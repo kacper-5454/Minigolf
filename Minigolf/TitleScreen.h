@@ -4,19 +4,21 @@
 #include <SFML/Audio.hpp>
 #include"Button.h"
 #include"Screen.h"
+
 class TitleScreen : public Screen
 {
 private:
 	sf::Texture texture;
-	Button play_button = Button("PLAY", sf::Vector2f(220.0, 270.0), sf::Vector2f(120.0, 60.0));
-	Button create_button = Button("CREATE", sf::Vector2f(460.0, 270.0), sf::Vector2f(120.0, 60.0));
-	sf::Font font;
+	Button play_button;
+	Button create_button;
 	sf::Text title;
-	sf::Music music;
+	sf::SoundBuffer buffer;
+	sf::Sound sound;
 public:
-	TitleScreen(int, int);
+	TitleScreen(sf::RenderWindow&);
 	std::string run(sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	char detectButton(sf::Vector2f);
+	void makeTitle(sf::RenderWindow&);
 };
 

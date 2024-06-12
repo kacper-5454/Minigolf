@@ -1,7 +1,8 @@
 #include "Button.h"
 #include<iostream>
+#include"MessageBox.h"
 
-Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size)
+Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size, sf::RenderWindow& window)
 {
     if (this->texture.loadFromFile("..\\Textures\\button_background.png"))
     {
@@ -9,7 +10,9 @@ Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size
     }
     else
     {
-        std::cerr << "Error: Could not load button background texture" << std::endl;
+        MessageBox messageBox("Couldn't load Button texture", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
     this->setPosition(position);
     this->setSize(size);
@@ -20,7 +23,9 @@ Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size
     }
     else
     {
-        std::cerr << "Couldnt load font while creating button" << std::endl;
+        MessageBox messageBox("Couldn't load font", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
     this->text.setString(text_string);
     this->text.setCharacterSize(size.y/2.0);
@@ -30,15 +35,6 @@ Button::Button(std::string text_string, sf::Vector2f position, sf::Vector2f size
     float text_offset_x = this->getSize().x/2.0 - (this->text.getGlobalBounds().getSize().x)/2.0;
     float text_offset_y = this->getSize().y / 2.0 - (this->text.getGlobalBounds().getSize().y) / 2.0;
     this->text.setPosition(sf::Vector2f(position.x+text_offset_x, position.y+text_offset_y));
-
-    if (this->buffer.loadFromFile("..\\Sounds\\button_click.wav"))
-    {
-        this->sound.setBuffer(this->buffer);
-    }
-    else
-    {
-        std::cerr << "Couldnt load button sound" << std::endl;
-    }
 }
 
 void Button::draw(sf::RenderWindow& window)
@@ -52,7 +48,6 @@ bool Button::isClicked(sf::Vector2f mouse_pos)
     sf::FloatRect bounds = this->getGlobalBounds();
     if (bounds.contains(mouse_pos))
     {
-        this->sound.play();
         return true;
     }
     else

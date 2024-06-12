@@ -10,22 +10,6 @@ sf::Texture Screen::loadTexture(std::string path)
     }
     else
     {
-        std::cerr << "Error: Could not load texture from " << path << std::endl;
+        throw("Couldnt load file from " + path);
     }
-}
-
-void Screen::handleResize(const sf::RenderWindow& window)
-{
-    sf::FloatRect visibleArea(0, 0, window.getSize().x, window.getSize().y);
-    this->view.reset(visibleArea);
-}
-
-sf::View Screen::getView()
-{
-    return this->view;
-}
-
-void Screen::setView(sf::View v)
-{
-    this->view = v;
 }

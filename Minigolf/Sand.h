@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include"BackgroundElement.h"
+
 class Sand : public BackgroundElement
 {
 public:

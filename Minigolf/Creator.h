@@ -4,6 +4,7 @@
 #include"Button.h"
 #include"Tile.h"
 #include"Textbox.h"
+#include"BackArrow.h"
 #include<set>
 
 class Creator :  public Screen
@@ -18,23 +19,21 @@ private:
 	sf::RectangleShape menuBackground;
 	sf::VertexArray grid;
 	std::set<Tile, Tile::Comparator> tiles;
-	sf::Font font;
 	std::vector<sf::Text> menuText;
 	sf::RectangleShape saveButton;
-	sf::RectangleShape backButton;
+	BackArrow backButton;
 	sf::Vector2f ball_pos;
 	std::string currentErrorMessage = "No errors";
 	Textbox textbox;
 	sf::Sound sound;
 	sf::SoundBuffer buffer;
-	sf::Music music;
 public:
-	Creator(int, int);
+	Creator(sf::RenderWindow&);
 	std::string run(sf::RenderWindow&);
 	void draw(sf::RenderWindow&);
 	void calculateMousePosGrid(sf::Vector2i, sf::RenderWindow&);
 	void makeIcons();
-	void loadTextures();
+	void loadTextures(sf::RenderWindow&);
 	void placeOnScreen();
 	void addTile(sf::Vector2f, int);
 	void makeText();

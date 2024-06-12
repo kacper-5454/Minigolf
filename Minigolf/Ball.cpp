@@ -19,6 +19,10 @@ void Ball::calculateDirectionAndSpeed(sf::RenderWindow& window)
     sf::Vector2f mousePositionF(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y));
     this->direction = this->getPosition() - mousePositionF;
     this->speed = std::sqrt(direction.x * direction.x + direction.y * direction.y) * 5.0; // Adjust speed factor as needed
+    if (this->speed > 500)
+    {
+        this->speed = 500;
+    }
     if (this->speed > 0.0f)
     {
         direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y); // Normalize direction

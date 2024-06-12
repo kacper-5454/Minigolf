@@ -1,46 +1,58 @@
 #include "TitleScreen.h"
 #include<iostream>
+#include"MessageBox.h"
 
-TitleScreen::TitleScreen(int windowSizeX, int windowSizeY)
+void TitleScreen::makeTitle(sf::RenderWindow& window)
 {
-    this->setSize(sf::Vector2f(windowSizeX, windowSizeY));
-    this->setPosition(sf::Vector2f(0.0, 0.0));
-    if (!this->texture.loadFromFile("..\\Textures\\title_background.jpg"))
-    {
-        std::cerr << "Couldnt load title background texture" << std::endl;
-    }
-    else
-    {
-        this->setTexture(&this->texture);
-    }
-    
     if (!this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
-        std::cerr << "Couldnt load font" << std::endl;
+        MessageBox messageBox("Couldn't load font", "OK", window);
+        messageBox.run(window);
+        window.close();
     }
-    else
-    {
-        this->title.setFont(this->font);
-    }
-
+    this->title.setFont(this->font);
     this->title.setString("MINIGOLF");
     this->title.setCharacterSize(120);
-    float text_pos_x = (static_cast<float>(windowSizeX) - this->title.getGlobalBounds().getSize().x)/2.0;
+    float text_pos_x = (static_cast<float>(window.getSize().x) - this->title.getGlobalBounds().getSize().x) / 2.0;
     this->title.setPosition(sf::Vector2f(text_pos_x, 100.0));
     this->title.setFillColor(sf::Color(255, 49, 49));
     this->title.setOutlineThickness(5.0);
     this->title.setOutlineColor(sf::Color(130, 6, 0));
-    if (!this->music.openFromFile("..\\Sounds\\intro_music.wav"))
+}
+
+TitleScreen::TitleScreen(sf::RenderWindow & window) :
+    play_button("PLAY", sf::Vector2f(220.0, 270.0), sf::Vector2f(120.0, 60.0), window),
+    create_button("CREATE", sf::Vector2f(460.0, 270.0), sf::Vector2f(120.0, 60.0), window)
+{
+    this->setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
+    this->setPosition(sf::Vector2f(0.0, 0.0));
+    try
     {
-        std::cerr << "Couldnt load intro music" << std::endl;
+        this->texture = this->loadTexture("..\\Textures\\title_background.jpg");        
     }
-    music.setLoop(true);
-    music.setVolume(25);
+    catch(...)
+    {
+        MessageBox messageBox("Couldn't load TitleScreen background", "OK", window);
+        messageBox.run(window);
+        window.close();
+    }
+    this->setTexture(&this->texture);
+    this->makeTitle(window);
+
+    if (this->buffer.loadFromFile("..\\Sounds\\button_click.wav"))
+    {
+        this->sound.setBuffer(this->buffer);
+    }
+    else
+    {
+        MessageBox messageBox("Couldn't load TitleScreen sound buffer", "OK", window);
+        messageBox.run(window);
+        window.close();
+    }
 }
 
 void TitleScreen::draw(sf::RenderWindow& window)
 {
-    window.setView(getView());
     window.draw(static_cast<sf::RectangleShape&>(*this));
     window.draw(this->title);
     play_button.draw(window);
@@ -65,8 +77,6 @@ char TitleScreen::detectButton(sf::Vector2f mouse_pos_view)
 
 std::string TitleScreen::run(sf::RenderWindow& window)
 {
-    this->music.play();
-    this->setView(window.getDefaultView());
     while (window.isOpen())
     {
         sf::Event event;
@@ -76,19 +86,13 @@ std::string TitleScreen::run(sf::RenderWindow& window)
             {
                 window.close();
             }
-                
-            if (event.type == sf::Event::Resized)
-            {
-                handleResize(window);
-            }
 
             if (event.type == sf::Event::MouseButtonPressed)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
                     sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-                    sf::Vector2f mouse_pos_view = window.mapPixelToCoords(mouse_pos, getView());
-                    char whichButton= this->detectButton(mouse_pos_view);
+                    char whichButton= this->detectButton(static_cast<sf::Vector2f>(mouse_pos));
                     switch (whichButton)
                     {
                     case 'p':
