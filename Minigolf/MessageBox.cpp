@@ -3,7 +3,7 @@
 
 void MessageBox::makeText(std::string text)
 {
-    if (this->font.loadFromFile("D:\\studia\\Programowanie Strukturalne i Obiektowe\\Minigolf\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
+    if (this->font.loadFromFile("..\\Fonts\\BarlowSemiCondensed-Bold.ttf"))
     {
         this->text.setFont(this->font);
     }
