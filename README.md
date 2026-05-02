@@ -1,27 +1,30 @@
-# Gra Minigolf
-![Strona startowa](./ReadMe_images/start_page.jpg)
+# Minigolf game
+![Start page](./ReadMe_images/start_page.jpg)
 
-# Funkcje
-- Różnorodne poziomy z przeszkodami
-- Precyzyje kontrolowanie kierunku oraz prędkości piłki za pomocą myszki
-- Kreator map
-- Grafika oparta na SFML
+# Features
+- Diverse levels with various obstacles
+- Precise control of ball direction and speed using the mouse
+- Build-in map creator
+- Graphics based on SFML
   
-![Gif gra](./ReadMe_images/game_play.gif)
+![Game gif](./ReadMe_images/game_play.gif)
 
-# Przykładowy poziom
-![Przykłądowy poziom gry](./ReadMe_images/level.jpg)
+# Example level
+![Example level](./ReadMe_images/level.jpg)
 
-![Przykłądowy poziom gry](./ReadMe_images/map_compleated.jpg)
+![Example level](./ReadMe_images/map_compleated.jpg)
 
-# Kreator map
-![Okno kreatora](./ReadMe_images/custom_map.jpg)
+# Map creator
+Create and test your own levels
 
-# Uruchomianie
-Wymagania:
+![Creator window](./ReadMe_images/custom_map.jpg)
+
+# Launch
+Prerequisites:
 - Visual Studio
-- komponenty C++ w Visual Studio
+- C++ development tools installed (Desktop development with C++)
   
-1. Sklonuj repozytorium lub pobierz je jako '.zip' i rozpakuj
-2. Otwórz plik "Minigolf.sln"
-3. Uruchom program
+1. Clone the repository or download it as a .zip file
+2. Open Minigolf.sln
+3. Click Local Windows Debugger
+Visual Studio will automatically build and run the game.
