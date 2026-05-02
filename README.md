@@ -10,4 +10,4 @@ Graj w Minigolfa i pokonuj coraz trudniejsze przeszkody!
 
 Lub stwórz własną mapę
 
-![Okno kreatora](./ReadMe_images/start_page.jpg)
+![Okno kreatora](./ReadMe_images/custom_map.jpg)
