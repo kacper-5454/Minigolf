@@ -14,9 +14,3 @@
 
 # Kreator map
 ![Okno kreatora](./ReadMe_images/custom_map.jpg)
-
-# Instalacja
-1. Pobierz plik Minigolf.zip
-2. Rozpakuj plik
-3. Wejdź w folder x64
-4. Uruchom Minigolf.exe
